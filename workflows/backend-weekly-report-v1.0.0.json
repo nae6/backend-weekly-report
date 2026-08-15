@@ -1,0 +1,524 @@
+{
+  "name": "Backend Saturday Report",
+  "nodes": [
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-5-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-5-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=あなたは10年以上の経験を持つシニアバックエンドエンジニア兼テックリードです。\n\n私はバックエンドエンジニアを目指して学習している初学者です。\n\n入力された最新記事を分析し、「今週のバックエンド技術レポート」を作成してください。\n\n# あなたの役割\n\n単なる要約ではなく、\n\n・何が起きたか\n・なぜ重要なのか\n・実務でどのように使われるのか\n・今の私が学ぶべきか\n\nまで説明してください。\n\n専門用語は使って構いませんが、\n必ず初心者にも理解できる説明を付けてください。\n\n========================\n\n# 出力形式\n\n# Backend Weekly Report\n日付:\n\n---\n\n## ① 今週最重要ニュース（最大3件）\n\n### タイトル\n\n### 何が起きた？\n\n3〜5行\n\n### なぜ重要？\n\n初心者向けに2〜4行\n\n### 現場ではどう使われる？\n\n実務例を簡潔に\n\n### 今学ぶ優先度\n\n★★★★★〜★☆☆☆☆\n\n### 公式ドキュメント\n\nあれば紹介\n\n---\n\n## ② 今週の技術トレンド\n\n100〜200文字\n\n---\n\n## ③ 図解（必要な場合のみ）\n\n概念の理解に役立つ場合のみMermaid記法で図解してください。\n\n処理の流れ・構成・関係性が分かる図を優先し、\n図が不要な場合は省略してください。\n\n---\n\n## ④ 今週の学習TODO\n\n3個まで\n\n例\n\n・Laravel公式を読む\n・PHP新機能を試す\n・Dockerで動かしてみる\n\n---\n\n## ⑤ 一言アドバイス\n\n学習の優先順位を一言で教えてください。\n\n========================\n\n# 入力データ\n\n以下の記事一覧を分析してください。\n\n{{ $json.articles.map((article, index) => `\n## 記事${index + 1}\n\nタイトル: ${article.title}\n公開日: ${article.pubDate}\nURL: ${article.link}\n\n本文:\n${article[\"content:encodedSnippet\"] || article[\"content:encoded\"]}\n`).join(\"\\n\\n\") }}\n\n日付:\n{{ $now.toISODate() }}\n\n========================\n\n# 出力ルール\n\n・Markdown形式\n\n・全体800〜1200文字程度\n\n・3分以内で読める量\n\n・重要でない記事は無理に紹介しない\n\n・公式情報を優先する\n\n・初心者に分かりやすく説明する\n\n・同じ内容の記事は1つにまとめる\n\n・重要度の高い順に紹介する\n\n・推測ではなく記事の内容を根拠に説明する\n\n・初心者に不要な情報は省略する\n\n・実際に業務で役立つ知識を優先する"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        944,
+        -288
+      ],
+      "id": "de4eb7ab-ecc8-4731-803a-e785dfebad73",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "wWVHDh7OTH3dIzdl",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0a5af044-b419-4669-9f39-35a7724a16b5",
+              "name": "=articles",
+              "value": "={{ $json.data }}",
+              "type": "array"
+            },
+            {
+              "id": "8613ce70-a08c-43fe-85bb-e5656c83b43d",
+              "name": "",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        800,
+        -288
+      ],
+      "id": "a1dedf3c-f3ee-4c6b-8a4d-fe6b04cfb5ee",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        688,
+        -48
+      ],
+      "id": "cd7d49f6-bded-4a31-8071-e248aa940103",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "databasePage",
+        "dataSourceId": {
+          "__rl": true,
+          "value": "3bca2d2d-0b55-8053-8402-000b39141a53",
+          "mode": "list",
+          "cachedResultName": "Backend Weekly Reports",
+          "cachedResultUrl": "https://app.notion.com/p/3bca2d2d0b55800eb330f071d68645d3"
+        },
+        "title": "=Backend Weekly Report {{ $now.format('yyyy-MM-dd') }}",
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Date|date",
+              "date": "={{ $now.toISODate() }}"
+            },
+            {
+              "key": "Report Type|select",
+              "selectValue": "Industry"
+            },
+            {
+              "key": "Priority|select",
+              "selectValue": "High"
+            },
+            {
+              "key": "Tags|multi_select",
+              "multiSelectValue": "laravel"
+            }
+          ]
+        },
+        "blockUi": {
+          "blockValues": [
+            {
+              "textContent": "={{ $json.chunk1 }}"
+            },
+            {
+              "textContent": "={{ $json.chunk2 }}"
+            },
+            {
+              "textContent": "={{ $json.chunk3 }}"
+            },
+            {
+              "textContent": "={{ $json.chunk4 }}"
+            },
+            {
+              "textContent": "={{ $json.chunk5 }}"
+            },
+            {
+              "textContent": "={{ $json.chunk6 }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 3,
+      "position": [
+        1376,
+        -112
+      ],
+      "id": "e4b2a45b-c350-438c-a47b-dc3b9fe770d1",
+      "name": "Create a database page",
+      "credentials": {
+        "notionOAuth2Api": {
+          "id": "6hCcgDMYBvKPON1k",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                6
+              ],
+              "triggerAtHour": 20
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -416,
+        128
+      ],
+      "id": "5f7863d2-2406-423b-931e-f7a0d6c419dc",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "numberInputs": 8
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        496,
+        64
+      ],
+      "id": "ede530e4-6cd5-454a-bfa8-f9edf61c42b6",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\n\n// OpenAIが生成したレポート本文を取得\nconst text =\n  input.output?.[0]?.content?.[0]?.text ?? '';\n\n// Notionの2000文字制限より少し余裕を持たせる\nconst MAX_LENGTH = 1800;\n\nfunction splitText(text, maxLength) {\n  const chunks = [];\n  let remaining = text;\n\n  while (remaining.length > maxLength) {\n    let splitAt = remaining.lastIndexOf('\\n', maxLength);\n\n    // 改行が近くになければ、空白で区切る\n    if (splitAt < maxLength * 0.5) {\n      splitAt = remaining.lastIndexOf(' ', maxLength);\n    }\n\n    // それでも区切れなければ強制的に分割\n    if (splitAt <= 0) {\n      splitAt = maxLength;\n    }\n\n    chunks.push(remaining.slice(0, splitAt).trim());\n    remaining = remaining.slice(splitAt).trim();\n  }\n\n  if (remaining.length > 0) {\n    chunks.push(remaining);\n  }\n\n  return chunks;\n}\n\nconst chunks = splitText(text, MAX_LENGTH);\n\nreturn [\n  {\n    json: {\n      ...input,\n\n      // 後で確認しやすいように保持\n      reportText: text,\n      chunkCount: chunks.length,\n\n      // Notionへ渡す\n      chunk1: chunks[0] ?? '',\n      chunk2: chunks[1] ?? '',\n      chunk3: chunks[2] ?? '',\n      chunk4: chunks[3] ?? '',\n      chunk5: chunks[4] ?? '',\n      chunk6: chunks[5] ?? '',\n    },\n  },\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1216,
+        -112
+      ],
+      "id": "e5d7c8fa-ddfb-469f-a3f2-b22e296733ea",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "url": "https://aws.amazon.com/about-aws/whats-new/recent/feed/",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        48,
+        480
+      ],
+      "id": "6733cd5e-5ff5-4a3c-9264-9659fc4a5aa1",
+      "name": "RSS - AWS What's New"
+    },
+    {
+      "parameters": {
+        "url": "https://laravel-news.com/feed",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        48,
+        -192
+      ],
+      "id": "7f43a3ce-5249-494c-9b05-069f26c6b681",
+      "name": "RSS - Laravel News RSS"
+    },
+    {
+      "parameters": {
+        "url": "https://feeds.feedburner.com/symfony/blog",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        48,
+        -352
+      ],
+      "id": "5a3d52b7-71d2-436d-a47d-d34e723e50aa",
+      "name": "RSS - Symfony Blog"
+    },
+    {
+      "parameters": {
+        "url": "https://www.php.net/feed.atom",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        48,
+        -32
+      ],
+      "id": "4150425f-1201-474f-9e4f-688455d814b9",
+      "name": "RSS - PHP Official"
+    },
+    {
+      "parameters": {
+        "url": "https://techblog.lycorp.co.jp/ja/feed/index.xml",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        48,
+        128
+      ],
+      "id": "0152422c-d0f6-401c-b57a-5fe6f61fa134",
+      "name": "RSS - LY Tech Blog"
+    },
+    {
+      "parameters": {
+        "url": "https://moneyforward-dev.jp/rss",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        48,
+        288
+      ],
+      "id": "b09e80a5-a2f4-4db0-a50e-85c1d3eeb09c",
+      "name": "RSS - Money Forward Developers"
+    },
+    {
+      "parameters": {
+        "url": "https://www.docker.com/blog/feed/",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        48,
+        640
+      ],
+      "id": "ab3ee807-99d3-44cd-afee-0dc52cbe4050",
+      "name": "RSS - Docker Blog"
+    },
+    {
+      "parameters": {
+        "url": "https://openai.com/news/rss.xml",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        32,
+        816
+      ],
+      "id": "3c20ede1-93f0-4281-9304-4723e16e2ddb",
+      "name": "RSS - OpenAI Developer Blog"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "RSS - Symfony Blog",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS - Laravel News RSS",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS - PHP Official",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS - LY Tech Blog",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS - Money Forward Developers",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS - AWS What's New",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS - Docker Blog",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS - OpenAI Developer Blog",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Create a database page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a database page": {
+      "main": [
+        []
+      ]
+    },
+    "RSS - AWS What's New": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 5
+          }
+        ]
+      ]
+    },
+    "RSS - Laravel News RSS": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "RSS - Symfony Blog": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS - PHP Official": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "RSS - LY Tech Blog": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "RSS - Money Forward Developers": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 4
+          }
+        ]
+      ]
+    },
+    "RSS - Docker Blog": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 6
+          }
+        ]
+      ]
+    },
+    "RSS - OpenAI Developer Blog": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 7
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "8d46dc11-70b3-4738-91b6-69869994058d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e47e5400afe495dbb69469e286a163a764cd268931c36a4fefc1e75832a6ecab"
+  },
+  "nodeGroups": [],
+  "id": "zOELfq9kQ9XB3gaX",
+  "tags": []
+}
