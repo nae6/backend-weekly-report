@@ -1,58 +1,147 @@
-# Backend Weekly Report
+# Backend Report Project
 
-An AI-powered workflow that automatically collects, analyzes, and summarizes backend engineering news every week, then stores a beginner-friendly report in Notion.
+An AI-powered backend engineering learning system that automatically collects, analyzes, and transforms weekly backend industry news into actionable learning plans.
+
+The project consists of two independent workflows:
+
+- **Saturday:** Backend Weekly Industry Report
+- **Sunday:** Sunday Learning Planner
+
+Together, they provide a continuous learning cycle from **industry analysis** to **personalized weekly learning**.
 
 ---
 
 # Overview
 
-Backend Weekly Report is an automated knowledge aggregation system designed for backend engineering learning.
+Backend Report Project is an automated learning support system for backend engineers.
 
-Every Saturday at **20:00**, the workflow:
+Every **Saturday**, the system:
 
-* Collects the latest backend-related articles
-* Evaluates their importance using OpenAI
-* Generates a beginner-friendly weekly report
-* Automatically saves the report to Notion
+- Collects backend-related articles from multiple trusted sources
+- Analyzes their technical importance using OpenAI
+- Generates a Backend Weekly Industry Report
+- Saves the report to Notion
 
-The goal of this project is **not to collect every article**, but to identify and summarize the information that is most valuable for backend engineers.
+Every **Sunday**, the system:
+
+- Reads the latest Industry Report
+- Analyzes the current learning sprint
+- Selects the highest-priority learning theme
+- Generates a practical one-week learning plan
+- Saves the Learning Report to Notion
+
+The objective is not simply to summarize news, but to transform industry trends into structured, practical learning.
 
 ---
 
 # Features
 
-* Automated weekly execution with n8n
-* Multi-source RSS aggregation
-* AI-based importance analysis
-* Duplicate topic consolidation
-* Beginner-friendly technical explanations
-* Automatic Notion integration
-* Structured weekly learning report
+## Saturday – Backend Weekly Industry Report
+
+- Automated weekly execution
+- Multi-source RSS aggregation
+- AI-based industry analysis
+- Duplicate topic consolidation
+- Beginner-friendly explanations
+- Technology trend summary
+- Automatic Notion integration
+
+---
+
+## Sunday – Sunday Learning Planner
+
+- Current Sprint analysis
+- Learning priority evaluation
+- Practical weekly learning plan generation
+- Step-based learning roadmap
+- Learning scope control
+- Mentor-style learning advice
+- Automatic Notion integration
+
+---
+
+# System Architecture
+
+```text
+                RSS / Official Sources
+                         │
+                         ▼
+        Backend Weekly Industry Report
+                         │
+                         ▼
+                   Notion Database
+                         │
+                         ▼
+              Sunday Learning Planner
+                         │
+                         ▼
+             Sunday Learning Report
+                         │
+                         ▼
+                   Notion Database
+```
 
 ---
 
 # Workflow
 
+## Saturday
+
 ```text
 Schedule Trigger
         │
         ▼
-RSS Read
+Collect RSS Articles
         │
         ▼
-Merge
+Normalize Articles
         │
         ▼
-Aggregate
+Remove Duplicate Topics
         │
         ▼
-Edit Fields
+Get AI Prompt
+        │
+        ▼
+Prepare OpenAI Request
         │
         ▼
 OpenAI
         │
         ▼
-Code
+Convert Properties
+        │
+        ▼
+Notion
+```
+
+---
+
+## Sunday
+
+```text
+Schedule Trigger
+        │
+        ▼
+Get Backend Weekly Industry Report
+        │
+        ▼
+Get Current Sprint
+        │
+        ▼
+Current Sprint Ready?
+        │
+        ▼
+Get AI Prompt
+        │
+        ▼
+Prepare OpenAI Request
+        │
+        ▼
+OpenAI
+        │
+        ▼
+Convert Properties
         │
         ▼
 Notion
@@ -64,63 +153,102 @@ Notion
 
 ## Official Sources
 
-* PHP Official
-* Laravel News
-* Symfony Blog
-* AWS What's New
-* Docker Blog
-* OpenAI Developer Blog
+- PHP Official
+- Laravel News
+- Symfony Blog
+- AWS What's New
+- Docker Blog
+- OpenAI Developer Blog
 
 ## Engineering Blogs
 
-* Money Forward Developers
-* LY Tech Blog
+- Money Forward Developers
+- LY Tech Blog
 
-These sources were carefully selected to maximize information quality while minimizing duplicate or low-value articles.
+The source list focuses on official announcements and high-quality engineering blogs while minimizing duplicate information.
 
 ---
 
-# Weekly Report Structure
+# Reports
 
-Each report contains:
+## Backend Weekly Industry Report
 
-* Top 3 Most Important News
-* Weekly Technology Trends
-* Mermaid Diagram (when necessary)
-* Learning TODOs
-* Short Learning Advice
+- Top 3 Most Important News
+- Technology Trends
+- Related Technologies
+- Mermaid Diagram (when necessary)
+- Weekly Summary
 
-The report is intentionally designed to be readable in approximately **3 minutes**.
+---
+
+## Sunday Learning Report
+
+- Practical Reference
+- Learning Theme
+- Learning Reason
+- Weekly Learning Plan
+- Step-based Learning Tasks
+- Do Not Learn This Week
+- Next Learning Candidate
+- Mentor's Advice
 
 ---
 
 # Technology Stack
 
-| Category             | Technology |
-| -------------------- | ---------- |
-| Workflow Automation  | n8n        |
-| AI                   | OpenAI API |
+| Category | Technology |
+| ----------- | ------------ |
+| Workflow Automation | n8n |
+| AI | OpenAI API |
 | Knowledge Management | Notion API |
-| Data Source          | RSS        |
+| Prompt Management | Notion Database |
+| Data Source | RSS |
 | Programming Language | JavaScript |
 
 ---
 
-# Project Structure
+# Repository Structure
 
 ```text
-backend-weekly-report/
+backend-report-project/
 
 ├── README.md
 │
 ├── docs/
-│   ├── backend-weekly-report-design-v1.0.md
-│   ├── architecture.md
-│   └── version-history.md
+│   ├── architecture/
+│   ├── prompts/
+│   │   ├── implementations/
+│   │   ├── specification/
+│   │   └── workflow/
+│   │
+│   └── workflows/
 │
 └── workflows/
-    └── backend-weekly-report-v1.0.0.json
+    ├── backend-weekly-report-v1.0.json
+    └── sunday-learning-planner-v1.1.json
 ```
+
+---
+
+# Design Documents
+
+The `docs` directory contains the complete project documentation.
+
+- Architecture
+- Workflow Design
+- Prompt Implementations
+- Prompt Specifications
+- Version History
+
+---
+
+# Design Principles
+
+- Separate Industry Analysis from Learning Planning
+- Prioritize Current Sprint over technology trends
+- Manage AI Prompts outside workflows
+- Prefer official sources whenever possible
+- Generate practical, achievable weekly learning plans
 
 ---
 
@@ -129,64 +257,70 @@ backend-weekly-report/
 Current Version
 
 ```text
-v1.0.0
+v1.1.0
 ```
 
 Status
 
 ```text
-Released
+Stable
 ```
 
 ---
 
 # Roadmap
 
-## Version 1.0 ✅
+## v1.0 ✅
 
-* Backend Weekly Report
-* Automated RSS Collection
-* AI-based Article Analysis
-* Weekly Report Generation
-* Notion Integration
-
-## Version 1.1
-
-* Role Model Analyzer
-* Technology Trend Analyzer
-* Learning Planner
-
-## Future Plans
-
-* Smarter article ranking
-* Additional high-quality backend sources
-* Report quality improvements
-* Enhanced learning recommendations
+- Backend Weekly Industry Report
+- RSS Aggregation
+- AI-based Industry Analysis
+- Notion Integration
 
 ---
 
-# Design Documents
+## v1.1 ✅
 
-Detailed documentation is available in the `docs/` directory.
+- Sunday Learning Planner
+- Current Sprint Integration
+- Prompt Management Database
+- Workflow Separation
+- Step-based Learning Plan
 
-* System Design
-* Architecture
-* Version History
+---
+
+## Future
+
+- Learning Backlog
+- Monthly Learning Review
+- Sprint Retrospective
+- Portfolio Review
+- Career Review
 
 ---
 
 # Why This Project?
 
-Many developers follow numerous technical blogs and official announcements, making it difficult to determine which information truly matters.
+Backend engineers are exposed to a large amount of technical information every week.
 
-This project addresses that challenge by allowing AI to filter, prioritize, and explain backend-related news from a beginner's perspective.
+Instead of reading dozens of articles, this project automatically identifies the most valuable backend topics, explains their practical impact, and converts them into a structured weekly learning plan.
 
-Instead of reading dozens of articles every week, users can review a concise report and immediately understand:
+The result is a continuous workflow that connects:
 
-* What happened
-* Why it matters
-* How it is used in real-world development
-* Whether it is worth learning now
+```text
+Industry Trends
+        │
+        ▼
+Industry Report
+        │
+        ▼
+Learning Decision
+        │
+        ▼
+Weekly Learning Plan
+```
+
+This allows learners to stay informed while maintaining focus on their current learning goals.
 
 ---
 
