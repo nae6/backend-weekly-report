@@ -24,7 +24,7 @@ See [`../../SETUP.md`](../../SETUP.md) for the human-readable walkthrough of wha
 
 作業を始める前に、以下をまとめて質問してください。
 
-1. これから作る6つのデータベースを配置したいNotionの親ページ(URLまたはページ名。なければ新規ページを作ってよいか確認してください)
+1. これから作る5つのデータベースを配置したいNotionの親ページ(URLまたはページ名。なければ新規ページを作ってよいか確認してください)
 2. 学習目標・現在の状況(例: どんな分野を学んでいるか、参考にしてほしいGitHubリポジトリや制作物があれば)
 3. 現在使える技術スタック(Current Skills)
 4. 今取り組んでいるテーマ(Current Focus)
@@ -33,9 +33,9 @@ See [`../../SETUP.md`](../../SETUP.md) for the human-readable walkthrough of wha
 
 回答を待ってから Step 2 に進んでください。
 
-## Step 2: Notionデータベースを6つ作成する
+## Step 2: Notionデータベースを5つ作成する
 
-Step 1で指定された親ページの配下に、以下6つのデータベースを作成してください。作成後、それぞれの data source ID(`collection://...`形式)を必ず記録しておいてください。以降の手順ですべて使います。
+Step 1で指定された親ページの配下に、以下5つのデータベースを作成してください。作成後、それぞれの data source ID(`collection://...`形式)を必ず記録しておいてください。以降の手順ですべて使います。
 
 ### 2-1. Backend Weekly Reports
 - Name (title)
@@ -56,15 +56,7 @@ Step 1で指定された親ページの配下に、以下6つのデータベー�
 - Current Focus (text)
 - Updated Date (date)
 
-### 2-4. AI Prompts
-- Name (title)
-- Description (text)
-- State (select: Draft, Active, Archived)
-- Version (text)
-- System Prompt (text)
-- User Prompt Template (text)
-
-### 2-5. Sunday Learning Reports
+### 2-4. Sunday Learning Reports
 - Title (title)
 - Date (date)
 - Status (select: Published, Draft)
@@ -73,11 +65,13 @@ Step 1で指定された親ページの配下に、以下6つのデータベー�
 
 (注: "Learning Completed" というcheckboxプロパティは、後述のStep 4の同期処理が初めて必要になったタイミングで自動追加されます。Step 2の時点では作らなくて構いません。)
 
-### 2-6. Learning Checklist
+### 2-5. Learning Checklist
 - Name (title)
 - Done (checkbox)
 - Reflected (checkbox)
 - Source Report Date (date)
+
+(注: 「AI Prompts」データベースは作りません。両方のスケジュールタスクとも、プロンプト本文をタスク定義に直接埋め込みます — Notionへ毎回問い合わせる必要をなくし、無人実行の可用性を優先するためです。)
 
 ## Step 3: 初期データを投入する
 
@@ -100,15 +94,100 @@ Step 1のヒアリング内容から、Learner Profileデータベースに1行�
 - Updated Date: 今日の日付
 - ページ本文: Current Sprintの内容
 
-## Step 4: AI Promptsデータベースへ Sunday Learning Planner 用のプロンプトを登録する
+## Step 4: スケジュールタスク(トリガー)を2つ作成する
 
-AI Promptsデータベースに、以下の内容で1行作成してください。
+このセッションで使えるスケジュールタスク作成機能を使って(rawなAPI呼び出しではなく、あなたが本来持っている「定期実行タスクを作る」ネイティブな機能を使ってください)、以下の2つを作成してください。それぞれのプロンプト中の `<...>` で囲まれた箇所は、Step 2で記録した実際のdata source IDに置き換えてから使ってください。
 
-- Name: "Sunday Learning Planner"
-- Description: "Generate weekly learning plans from Backend Weekly Report and Current Sprint."
-- State: "Active"
-- Version: "1.0.0"
-- System Prompt: 以下のブロックの内容をそのままコピーしてください
+Notionコネクタの書き込み系ツール(ページ作成・ページ更新、および後述のスキーマ追加)は、無人実行で権限確認プロンプトに阻まれないよう、可能であれば常時許可(always_allow)に設定してください。設定できない場合は、初回実行時に権限プロンプトが出ても数分待てば自動的に先に進むことを私に伝えてください。
+
+### 4-1. 土曜20:00 JST(毎週): Backend Weekly Report Generator
+
+トリガー名の例: "Backend Weekly Report Generator"
+cron: 毎週土曜 20:00(あなたのローカルタイムゾーンで設定してください)
+
+プロンプト:
+
+あなたは以下の自動化タスクを完全に自律的に実行してください。実行日時は毎週土曜20:00です。
+
+### Step 0: 学習進捗をLearner Profile/Learning Contextsに反映する
+これは今週分だけでなく、過去の未反映分も含めて毎回チェックする定期同期処理です。以下を、後続のBackend Weekly Report生成処理より先に行ってください。
+
+1. データソース collection://<LEARNING_CHECKLIST_ID> (「Learning Checklist」)から、Done = true かつ Reflected = false の項目を全件取得してください(特定の週に限らず、過去のすべての未反映の完了項目が対象です)。
+
+2. 該当する項目が1件もなければ、この Step 0 は何もせず、そのままStep 1以降(通常のBackend Weekly Report Generator処理)に進んでください。
+
+3. 該当する項目がある場合:
+   a. それらの項目のName(内容)をもとに、何を学び・実践できたかを簡潔に把握してください。
+   b. データソース collection://<LEARNER_PROFILE_ID> (「Learner Profile」)から Name="Learner Profile" の行を取得し、"Current Skills" と "Current Focus" を、完了した項目の内容を踏まえて更新してください。既存の内容を丸ごと消さず、新しく身についたスキルや変化があれば追記・調整する形にしてください。"Updated Date" を今日の日付に更新してください。
+   c. データソース collection://<LEARNING_CONTEXTS_ID> (「Learning Contexts」)から Status="Active" のページ(Current Sprint)を取得し、完了した項目を踏まえて内容を更新してください(進捗の反映のみ行い、Sprint自体を完了扱いにするなどの判断はしないでください)。
+   d. 反映した各Learning Checklist項目について、Reflected を true に更新してください。
+
+4. 全項目完了判定:
+   手順1で取得した項目(Reflectedをtrueにしたもの含む)について、それぞれの Source Report Date ごとに、同じ Source Report Date を持つLearning Checklist項目が全件 Done = true になっているかを確認してください(未確認ならそのSource Report Dateで再度データソースを検索してください)。
+   全件完了と判定できたSource Report Dateがあれば、その日付ごとに:
+   a. データソース collection://<SUNDAY_LEARNING_REPORTS_ID> (「Sunday Learning Reports」)のスキーマに "Learning Completed" というcheckboxプロパティが存在するか確認してください。存在しなければ追加してください。
+   b. その Source Report Date に一致するSunday Learning Reportページ("Source Report Date" プロパティで検索)を特定し、"Learning Completed" が既にtrueでなければ true に更新してください。
+
+このStep 0で何か問題が起きても(データが見つからない、プロパティ名が想定と違う等)、致命的なエラーとして扱わず、その旨を最終報告に記録した上で、必ずStep 1以降(本来のBackend Weekly Report Generator処理)に進んでください。
+
+### 事前チェック(重複防止)
+まず、データソース collection://<BACKEND_WEEKLY_REPORTS_ID> (「Backend Weekly Reports」)を、今日の日付の "Date" で検索してください。すでに今日の日付のページが存在する場合は、新規作成せずにそのページURLを報告して終了してください。
+
+### 1. 各情報源から最新記事を調べる(WebSearchのみを使用・WebFetchは使わない)
+以下の情報源について(私が学びたい技術スタックに合わせて選んでください。例: 使っているフレームワークの公式ブログ、言語の公式サイト、クラウドプロバイダのアップデート情報など)、それぞれ `WebSearch` ツールを `allowed_domains` で対象ドメインに絞って呼び出し、直近7日以内に公開された記事を探してください。他の情報源の検索結果を待たずに続けて呼び出して構いません(並列的に投げてOK)。
+
+**重要(必ず守る)**:
+- RSS/AtomフィードのURLや記事本文ページへの直接アクセス(`WebFetch`)は一切使わないでください。無人・自動実行のため、WebFetchの権限確認プロンプトが処理の遅延につながります。WebSearchの検索結果(スニペット)に含まれる情報だけで記事概要を組み立ててください。
+- 1つの情報源で有効な検索結果が得られなくても、絶対にそこで処理を止めないでください。その情報源はスキップし、取得できた他の情報源の記事だけでレポートを作成してください。全滅した場合のみ、記事なしである旨を報告して終了してください。1情報源あたりの検索は1回まで(リトライしない)。
+
+### 2. レポートを生成する
+収集した記事をもとに、あなた自身が「Backend Weekly Industry Report」を生成してください(外部AI APIは使わず、あなた自身が執筆します)。長考せず、要点を押さえて簡潔に執筆してください。
+
+内容:
+- 今週最重要ニュース(最大3件、各記事について「何が起きた?」「なぜ重要?実務ではどう使われる?」「初心者向け解説」「学習優先度」「公式ドキュメント」)
+- 今週の技術トレンド(100〜200文字)
+- 関連技術の列挙
+- 今週の総括(200〜300文字)
+
+ルール:
+・記事単位ではなくテーマ単位で整理してください。
+・同じ内容の記事は統合してください。
+・一次情報を優先してください。
+・図解(Mermaidなど)は一切含めないでください。
+・Markdown形式で出力してください。
+
+### 3. Notionに保存する
+データソース collection://<BACKEND_WEEKLY_REPORTS_ID> (「Backend Weekly Reports」)に新規ページを作成してください。
+
+- Name (title): "Backend Weekly Report {今日の日付 YYYY-MM-DD}"
+- Date: 今日の日付
+- Report Type: "Industry"
+- Priority: レポート内容の重要度に応じて "High" / "Medium" / "Low" のいずれかをあなたが判断して設定(固定値にしない)
+- Tags: レポートで扱った技術のうち、Tags列に現在すでに存在する選択肢の中からのみ該当するものを選んで設定してください。重要: notion-update-data-source ツールやその他の方法でTags列のスキーマ(選択肢)を変更しないでください。このタスクは無人・自動実行のため、スキーマ変更は承認待ちの権限プロンプトで処理が永久に停止する原因になります。該当する既存タグが1つもない場合は、Tagsを空のままにして処理を続けてください。
+- content: 生成した「Backend Weekly Industry Report」のMarkdown全文をそのまま渡してください。
+
+### 4. 完了報告
+最後に、作成したNotionページのURL、使用できたソース数、かかったおおよその時間感を含めて簡潔に報告してください。
+
+### 4-2. 日曜20:00 JST(毎週): Sunday Learning Planner
+
+トリガー名の例: "Sunday Learning Planner"
+cron: 毎週日曜 20:00(あなたのローカルタイムゾーンで設定してください)
+
+プロンプト:
+
+あなたは以下の自動化タスクを完全に自律的に実行してください。実行日時は毎週日曜20:00です。Notionツールを使用してください。
+
+## 手順
+
+### 1. 必要な情報をNotionから収集する
+
+1. データソース collection://<BACKEND_WEEKLY_REPORTS_ID> (「Backend Weekly Reports」)から、Report Type = "Industry" で Date が最も新しいページを1件取得し、そのページ本文(Markdown)を取得する → weeklyReport とその日付(sourceReportDate)
+2. データソース collection://<LEARNING_CONTEXTS_ID> (「Learning Contexts」)から、Status = "Active" のページを1件取得(なければ空)。あればそのページ本文(Markdown)を取得 → currentSprint。なければ currentSprint は空文字列。
+3. データソース collection://<LEARNER_PROFILE_ID> (「Learner Profile」)から、Name = "Learner Profile" の行を1件取得し、そのプロパティ "Learner Profile" → learnerProfile、"Current Skills" → currentSkills、"Current Focus" → currentFocus を取得。
+
+### 2. レポートを生成する
+収集した情報をもとに、あなた自身が以下のSystem Promptに厳密に従って「Sunday Learning Report」を生成してください(外部AI APIは使わず、あなた自身が執筆します)。
 
 ---SYSTEM PROMPT開始---
 あなたは10年以上の実務経験を持つシニアバックエンドエンジニア兼テックリードです。
@@ -489,165 +568,16 @@ STEP3
 - 有名という理由だけで参考資料を選ぶ
 ---SYSTEM PROMPT終了---
 
-- User Prompt Template: 以下のブロックの内容をそのままコピーしてください
+以下の情報をSystem Promptへの入力として扱い、Output Format指示に厳密に従ってレポートを生成してください。
 
----USER PROMPT TEMPLATE開始---
-以下の情報をもとに、次の1週間の Sunday Learning Report を作成してください。
+- Current Sprint: currentSprint
+- Current Focus: currentFocus(currentSprintの本文に含まれていなければ、currentSprintの内容から推測せず「特になし」として扱ってください)
+- Learner Profile: learnerProfile
+- Current Skills: currentSkills
+- Backend Weekly Industry Report: weeklyReport
+- Report Date: 本日の日付(YYYY-MM-DD)
 
-========================
-
-## Current Sprint
-
-{{currentSprint}}
-
-========================
-
-## Current Focus
-
-{{currentFocus}}
-
-========================
-
-## Learner Profile
-
-{{learnerProfile}}
-
-========================
-
-## Current Skills
-
-{{currentSkills}}
-
-========================
-
-## Backend Weekly Industry Report
-
-{{weeklyReport}}
-
-========================
-
-## Report Date
-
-{{reportDate}}
-
-========================
-
-System Promptで定義されたルールを守ってください。
-
-Current Sprintを最優先に判断してください。
-
-Backend Weekly Industry Reportは技術動向を判断する材料として利用してください。
-
-学習テーマは原則1つにしてください。
-
-1週間で完了できる計画にしてください。
-
-Markdown形式で出力してください。
----USER PROMPT TEMPLATE終了---
-
-## Step 5: スケジュールタスク(トリガー)を2つ作成する
-
-このセッションで使えるスケジュールタスク作成機能を使って(rawなAPI呼び出しではなく、あなたが本来持っている「定期実行タスクを作る」ネイティブな機能を使ってください)、以下の2つを作成してください。それぞれのプロンプト中の `<...>` で囲まれた箇所は、Step 2で記録した実際のdata source IDに置き換えてから使ってください。
-
-Notionコネクタの書き込み系ツール(ページ作成・ページ更新、および後述のスキーマ追加)は、無人実行で権限確認プロンプトに阻まれないよう、可能であれば常時許可(always_allow)に設定してください。設定できない場合は、初回実行時に権限プロンプトが出ても数分待てば自動的に先に進むことを私に伝えてください。
-
-### 5-1. 土曜20:00 JST(毎週): Backend Weekly Report Generator
-
-トリガー名の例: "Backend Weekly Report Generator"
-cron: 毎週土曜 20:00(あなたのローカルタイムゾーンで設定してください)
-
-プロンプト:
-
-あなたは以下の自動化タスクを完全に自律的に実行してください。実行日時は毎週土曜20:00です。
-
-### Step 0: 学習進捗をLearner Profile/Learning Contextsに反映する
-これは今週分だけでなく、過去の未反映分も含めて毎回チェックする定期同期処理です。以下を、後続のBackend Weekly Report生成処理より先に行ってください。
-
-1. データソース collection://<LEARNING_CHECKLIST_ID> (「Learning Checklist」)から、Done = true かつ Reflected = false の項目を全件取得してください(特定の週に限らず、過去のすべての未反映の完了項目が対象です)。
-
-2. 該当する項目が1件もなければ、この Step 0 は何もせず、そのままStep 1以降(通常のBackend Weekly Report Generator処理)に進んでください。
-
-3. 該当する項目がある場合:
-   a. それらの項目のName(内容)をもとに、何を学び・実践できたかを簡潔に把握してください。
-   b. データソース collection://<LEARNER_PROFILE_ID> (「Learner Profile」)から Name="Learner Profile" の行を取得し、"Current Skills" と "Current Focus" を、完了した項目の内容を踏まえて更新してください。既存の内容を丸ごと消さず、新しく身についたスキルや変化があれば追記・調整する形にしてください。"Updated Date" を今日の日付に更新してください。
-   c. データソース collection://<LEARNING_CONTEXTS_ID> (「Learning Contexts」)から Status="Active" のページ(Current Sprint)を取得し、完了した項目を踏まえて内容を更新してください(進捗の反映のみ行い、Sprint自体を完了扱いにするなどの判断はしないでください)。
-   d. 反映した各Learning Checklist項目について、Reflected を true に更新してください。
-
-4. 全項目完了判定:
-   手順1で取得した項目(Reflectedをtrueにしたもの含む)について、それぞれの Source Report Date ごとに、同じ Source Report Date を持つLearning Checklist項目が全件 Done = true になっているかを確認してください(未確認ならそのSource Report Dateで再度データソースを検索してください)。
-   全件完了と判定できたSource Report Dateがあれば、その日付ごとに:
-   a. データソース collection://<SUNDAY_LEARNING_REPORTS_ID> (「Sunday Learning Reports」)のスキーマに "Learning Completed" というcheckboxプロパティが存在するか確認してください。存在しなければ追加してください。
-   b. その Source Report Date に一致するSunday Learning Reportページ("Source Report Date" プロパティで検索)を特定し、"Learning Completed" が既にtrueでなければ true に更新してください。
-
-このStep 0で何か問題が起きても(データが見つからない、プロパティ名が想定と違う等)、致命的なエラーとして扱わず、その旨を最終報告に記録した上で、必ずStep 1以降(本来のBackend Weekly Report Generator処理)に進んでください。
-
-### 事前チェック(重複防止)
-まず、データソース collection://<BACKEND_WEEKLY_REPORTS_ID> (「Backend Weekly Reports」)を、今日の日付の "Date" で検索してください。すでに今日の日付のページが存在する場合は、新規作成せずにそのページURLを報告して終了してください。
-
-### 1. 各情報源から最新記事を調べる(WebSearchのみを使用・WebFetchは使わない)
-以下の情報源について(私が学びたい技術スタックに合わせて選んでください。例: 使っているフレームワークの公式ブログ、言語の公式サイト、クラウドプロバイダのアップデート情報など)、それぞれ `WebSearch` ツールを `allowed_domains` で対象ドメインに絞って呼び出し、直近7日以内に公開された記事を探してください。他の情報源の検索結果を待たずに続けて呼び出して構いません(並列的に投げてOK)。
-
-**重要(必ず守る)**:
-- RSS/AtomフィードのURLや記事本文ページへの直接アクセス(`WebFetch`)は一切使わないでください。無人・自動実行のため、WebFetchの権限確認プロンプトが処理の遅延につながります。WebSearchの検索結果(スニペット)に含まれる情報だけで記事概要を組み立ててください。
-- 1つの情報源で有効な検索結果が得られなくても、絶対にそこで処理を止めないでください。その情報源はスキップし、取得できた他の情報源の記事だけでレポートを作成してください。全滅した場合のみ、記事なしである旨を報告して終了してください。1情報源あたりの検索は1回まで(リトライしない)。
-
-### 2. レポートを生成する
-収集した記事をもとに、あなた自身が「Backend Weekly Industry Report」を生成してください(外部AI APIは使わず、あなた自身が執筆します)。長考せず、要点を押さえて簡潔に執筆してください。
-
-内容:
-- 今週最重要ニュース(最大3件、各記事について「何が起きた?」「なぜ重要?実務ではどう使われる?」「初心者向け解説」「学習優先度」「公式ドキュメント」)
-- 今週の技術トレンド(100〜200文字)
-- 関連技術の列挙
-- 今週の総括(200〜300文字)
-
-ルール:
-・記事単位ではなくテーマ単位で整理してください。
-・同じ内容の記事は統合してください。
-・一次情報を優先してください。
-・図解(Mermaidなど)は一切含めないでください。
-・Markdown形式で出力してください。
-
-### 3. Notionに保存する
-データソース collection://<BACKEND_WEEKLY_REPORTS_ID> (「Backend Weekly Reports」)に新規ページを作成してください。
-
-- Name (title): "Backend Weekly Report {今日の日付 YYYY-MM-DD}"
-- Date: 今日の日付
-- Report Type: "Industry"
-- Priority: レポート内容の重要度に応じて "High" / "Medium" / "Low" のいずれかをあなたが判断して設定(固定値にしない)
-- Tags: レポートで扱った技術のうち、Tags列に現在すでに存在する選択肢の中からのみ該当するものを選んで設定してください。重要: notion-update-data-source ツールやその他の方法でTags列のスキーマ(選択肢)を変更しないでください。このタスクは無人・自動実行のため、スキーマ変更は承認待ちの権限プロンプトで処理が永久に停止する原因になります。該当する既存タグが1つもない場合は、Tagsを空のままにして処理を続けてください。
-- content: 生成した「Backend Weekly Industry Report」のMarkdown全文をそのまま渡してください。
-
-### 4. 完了報告
-最後に、作成したNotionページのURL、使用できたソース数、かかったおおよその時間感を含めて簡潔に報告してください。
-
-### 5-2. 日曜20:00 JST(毎週): Sunday Learning Planner
-
-トリガー名の例: "Sunday Learning Planner"
-cron: 毎週日曜 20:00(あなたのローカルタイムゾーンで設定してください)
-
-プロンプト:
-
-あなたは以下の自動化タスクを完全に自律的に実行してください。実行日時は毎週日曜20:00です。Notionツールを使用してください。
-
-## 手順
-
-### 1. 必要な情報をNotionから収集する
-
-1. データソース collection://<BACKEND_WEEKLY_REPORTS_ID> (「Backend Weekly Reports」)から、Report Type = "Industry" で Date が最も新しいページを1件取得し、そのページ本文(Markdown)を取得する → weeklyReport とその日付(sourceReportDate)
-2. データソース collection://<LEARNING_CONTEXTS_ID> (「Learning Contexts」)から、Status = "Active" のページを1件取得(なければ空)。あればそのページ本文(Markdown)を取得 → currentSprint。なければ currentSprint は空文字列。
-3. データソース collection://<LEARNER_PROFILE_ID> (「Learner Profile」)から、Name = "Learner Profile" の行を1件取得し、そのプロパティ "Learner Profile" → learnerProfile、"Current Skills" → currentSkills、"Current Focus" → currentFocus を取得。
-4. データソース collection://<AI_PROMPTS_ID> (「AI Prompts」)から、Name = "Sunday Learning Planner" かつ State = "Active" の行を1件取得し、プロパティ "System Prompt" → systemPrompt、"User Prompt Template" → userPromptTemplate を取得。
-
-### 2. プロンプトを組み立てて自分自身で実行する
-userPromptTemplate 内の以下のプレースホルダーを実際の値で置換してください。
-- {{currentSprint}} → currentSprint
-- {{currentFocus}} → currentFocus
-- {{learnerProfile}} → learnerProfile
-- {{currentSkills}} → currentSkills
-- {{weeklyReport}} → weeklyReport
-- {{reportDate}} → 本日の日付(YYYY-MM-DD)
-
-置換後の文章を「ユーザーからのリクエスト」、systemPromptを「あなたの振る舞いのルール」として扱い、あなた自身が(外部AI APIを使わず)Sunday Learning Reportを生成してください。systemPrompt内のOutput Format指示に厳密に従い、Markdown形式で出力してください。
+Current Sprintを最優先に判断し、学習テーマは原則1つ、1週間で完了できる計画にしてください。Markdown形式で出力してください。
 
 ### 3. Notionに保存する
 データソース collection://<SUNDAY_LEARNING_REPORTS_ID> (「Sunday Learning Reports」)に新規ページを作成してください。
@@ -673,12 +603,12 @@ userPromptTemplate 内の以下のプレースホルダーを実際の値で置�
 ### 5. 完了報告
 最後に、作成したNotionページのURL(Sunday Learning Report本体、および学習チェックリストに追加した項目数)を含めて簡潔に完了を報告してください。もし元となるBackend Weekly Reportが見つからなかった場合は、無理に生成せず、その旨だけ報告して終了してください。
 
-## Step 6: 確認・報告
+## Step 5: 確認・報告
 
 すべて完了したら、以下を私に報告してください。
 
-- Step 2で作成した6つのデータベースそれぞれのURL
-- Step 5で作成した2つのスケジュールタスクの名前・次回実行予定時刻
+- Step 2で作成した5つのデータベースそれぞれのURL
+- Step 4で作成した2つのスケジュールタスクの名前・次回実行予定時刻
 - 手動でテスト実行できる場合は、土曜側のトリガーを一度手動実行して、Notionにページが正しく作成されるか確認し、結果を報告してください(その場合、Step 0は「未完了項目0件」で何もせずスキップされるのが正常です)
 ```
 
@@ -689,3 +619,4 @@ userPromptTemplate 内の以下のプレースホルダーを実際の値で置�
 - The template intentionally avoids the `" Version"` / `" Source Report Date"` leading-space property names that exist in the original author's live instance — those were an accidental naming quirk from the original manual setup, not something worth propagating.
 - `Learning Completed` is added lazily by Step 0's sync logic the first time it actually has something to reflect, not during initial setup — this matches how the schema-change safety rule works in production (see [`../architecture/architecture.md`](../architecture/architecture.md), Unattended Safety).
 - The RSS/search source list in the Saturday prompt is deliberately left open ("私が学びたい技術スタックに合わせて選んでください") rather than hardcoded to PHP/Laravel/AWS/Docker/Symfony, since a different learner will have a different stack.
+- There is no "AI Prompts" database in this template (there was one in earlier versions of this project). Both trigger prompts are self-contained, matching the live production setup as of v2.1.0 — see [`../architecture/version-history.md`](../architecture/version-history.md).

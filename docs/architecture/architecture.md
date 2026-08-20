@@ -39,13 +39,9 @@ Backend Report Project は、バックエンドエンジニアを目指す学習
                            ▼
                     Notion Database
                            │
-          ┌────────────────┴────────────────┐
-          │                                 │
-          ▼                                 ▼
- AI Prompts Database              Current Sprint Database
-   (Sunday only)                                │
-          │                                 │
-          └────────────────┬────────────────┘
+                           ▼
+                 Current Sprint Database
+                           │
                            ▼
                Sunday Learning Planner
                            │
@@ -61,7 +57,7 @@ Backend Report Project は、バックエンドエンジニアを目指す学習
         fed back into next Saturday's Step 0
 ```
 
-Saturday's prompt is embedded directly in its Claude Scheduled Task, not fetched from the AI Prompts Database — see [Changed: Prompt Management](version-history.md) in v2.0.0.
+Both Saturday's and Sunday's prompts are embedded directly in their Claude Scheduled Task, not fetched from Notion — see [Changed: Prompt Management](version-history.md) in v2.0.0 (Saturday) and v2.1.0 (Sunday).
 
 ---
 
@@ -97,13 +93,11 @@ Sunday Learning Report
 
 ---
 
-## AI Prompts Database
+## AI Prompts Database（v2.1.0で廃止）
 
-役割
+v2.0.0まではSundayのPromptをこのデータベースから動的取得していたが、v2.1.0でSaturdayと同じ埋め込み方式に統一したため、どちらのTriggerからも参照されなくなった。
 
-AI Promptを一元管理する。
-
-保持する情報
+保持していた情報（参考）
 
 - Report Type
 - Version
@@ -111,7 +105,7 @@ AI Promptを一元管理する。
 - System Prompt
 - User Prompt Template
 
-WorkflowへPrompt本文は保持しない。
+Notion上のデータベース自体は自動では削除されない。残すか削除するかは運用者の判断。
 
 ---
 
@@ -169,31 +163,11 @@ Saturday Step 0（Learning Progress Sync）が読み取る。
 
 # Prompt Architecture
 
-PromptはTriggerから分離することを原則とするが、v2.0.0でSaturdayのみ例外を設けた。
+v2.0.0ではSaturdayのみPromptをTrigger定義に直接埋め込む例外運用だったが、v2.1.0でSundayも同じ方式に統一した。
 
 ```text
-Sunday Trigger
-
-↓
-
-AI Prompts Database
-
-↓
-
-System Prompt
-
-+
-
-User Prompt Template
-
-↓
-
-Claude (self)
-```
-
-```text
-Saturday Trigger
-（System PromptをTrigger定義に直接埋め込み）
+Saturday Trigger / Sunday Trigger
+（System PromptをそれぞれのTrigger定義に直接埋め込み）
 
 ↓
 
@@ -202,11 +176,9 @@ Claude (self)
 
 外部AI API（OpenAI）は使用しない。Claude自身がレポートを執筆する。
 
-Saturdayでprompt本文を直接埋め込んでいる理由は、無人実行における可用性を優先し、
+Prompt本文を直接埋め込んでいる理由は、無人実行における可用性を優先し、Notion側の状態（Active/Versionフラグの設定ミスなど）に依存する箇所を減らすため。あわせて、Notionへの問い合わせ回数そのものを減らせるという副次効果もある。
 
-Notion側の状態（Active/Versionフラグの設定ミスなど）に依存する箇所を減らすため。
-
-Prompt変更時はTriggerの動作フロー（Step順序）を変更しない。
+Prompt変更時はTriggerの動作フロー（Step順序）を変更しない。Prompt本文を編集したい場合は、対応するTrigger定義を直接更新する（Notion側にはもうプロンプトの正はない）。
 
 ---
 
@@ -438,7 +410,7 @@ docs/
 
 Current Version
 
-v2.0.0
+v2.1.0
 
 Status
 

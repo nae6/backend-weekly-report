@@ -95,7 +95,7 @@ RSS/AtomフィードそのものへのWebFetchアクセスは行わない（Unat
 
 トリガー定義に直接埋め込まれている。
 
-Notion AI Prompts Databaseからの動的取得は行わない（Sunday側とは異なる設計）。
+Notion AI Prompts Databaseからの動的取得は行わない（v2.1.0からはSunday側も同じ方式）。
 
 ---
 

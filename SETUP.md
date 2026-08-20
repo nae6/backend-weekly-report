@@ -9,7 +9,7 @@ This project is not a service you sign up for — it's a design you run yourself
 - Two weekly scheduled Claude agents (no server, no n8n, no API keys to manage):
   - **Saturday**: reads what you finished learning last week and updates your profile, then researches your stack and writes an industry report.
   - **Sunday**: turns that report + your current sprint into a one-week learning plan, and breaks it into a checklist.
-- 6 Notion databases that hold your profile, your sprint context, and the generated reports/checklist.
+- 5 Notion databases that hold your profile, your sprint context, and the generated reports/checklist. (No prompt database — both scheduled tasks carry their own prompt.)
 - A closed loop: you check off checklist items in Notion during the week → next Saturday reads what you finished → updates your profile → informs next Sunday's plan.
 
 ## What you need before starting
@@ -24,7 +24,7 @@ This project is not a service you sign up for — it's a design you run yourself
 2. Make sure the Notion connector is connected in that session.
 3. Open [`docs/setup/onboarding-prompt.md`](docs/setup/onboarding-prompt.md), copy the entire prompt block, and paste it into the new chat.
 4. Answer Claude's questions (your learning goals, current skills, current focus, etc.).
-5. Claude will create the 6 Notion databases, seed them with your answers, and create the two scheduled tasks. This takes a few minutes.
+5. Claude will create the 5 Notion databases, seed them with your answers, and create the two scheduled tasks. This takes a few minutes.
 6. Review what got created — the databases, and the two scheduled tasks' next-run times.
 
 That's it. From then on, it runs on its own every Saturday/Sunday at 20:00 in your local time (or whatever time you asked for).
