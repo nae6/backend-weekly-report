@@ -4,6 +4,120 @@
 
 ---
 
+# v2.1.0
+
+## Release Date
+
+2026-08
+
+---
+
+## Overview
+
+Notionの「AI Prompts」データベースを廃止しました。
+
+Sunday Learning PlannerのSystem Prompt/User Prompt Templateを、
+
+Saturdayと同じくトリガー定義への直接埋め込み方式へ変更したことで、
+
+このデータベースはどちらのWorkflowからも参照されなくなりました。
+
+---
+
+# Changed
+
+## Prompt Management (Sunday)
+
+Notion AI Prompts Databaseからの動的取得(Name="Sunday Learning Planner" AND State="Active"を検索)をやめ、
+
+System Prompt / User Prompt Templateの内容をトリガー定義に直接埋め込む方式へ変更。
+
+v2.0.0でSaturdayに適用した変更と同じ理由による(無人実行の可用性優先、Notion側の設定ミスに依存する箇所の削減)。
+
+副次効果として、Sunday実行時のNotion問い合わせが2回(検索1回・取得1回)減った。
+
+---
+
+# Removed
+
+## AI Prompts Database(参照なし)
+
+v2.0.0時点でSaturdayからは既に参照されておらず、v2.1.0でSundayからの参照もなくなったため、
+
+このデータベースは実質的に不要になった。
+
+Notion上のデータベース自体は自動では削除しない。残すか削除するかは運用者の判断に委ねる。
+
+---
+
+# Directory Structure
+
+変更なし。
+
+---
+
+# Breaking Changes
+
+なし。Notion側のプロパティ・データは変更していない(AI Prompts Databaseへの書き込み・読み込みを単に行わなくなっただけ)。
+
+---
+
+# Future Roadmap
+
+予定(v2.0.0から変更なし)
+
+- Sunday Workflowへの重複防止チェック追加
+- Learning Checklist抽出粒度のチューニング
+- Learning Backlog
+- Monthly Learning Review
+- Sprint Retrospective
+- Portfolio Review
+- Career Review
+
+検討中(未着手)
+
+- Learning Contexts データベースをLearner Profileへ統合し、データベース数をさらに減らす案(Sprintの履歴管理をどう扱うか要検討のため保留)
+
+---
+
+# Current Status
+
+Architecture
+
+Completed
+
+Prompt
+
+Completed(SaturdayもSundayも埋め込み方式で統一)
+
+Specification
+
+Completed
+
+Workflow
+
+Migrated to Claude Scheduled Tasks
+
+Learning Progress Sync
+
+Implemented
+
+Learning Checklist
+
+Implemented
+
+---
+
+# Current Version (as of v2.1.0)
+
+v2.1.0
+
+Status
+
+Stable
+
+---
+
 # v2.0.0
 
 ## Release Date
@@ -280,13 +394,15 @@ Implemented
 
 ---
 
-# Current Version (as of v2.0.0)
+# Version (as of v2.0.0 release)
 
 v2.0.0
 
 Status
 
 Stable
+
+(superseded by v2.1.0 — see top of this document for the current version)
 
 ---
 

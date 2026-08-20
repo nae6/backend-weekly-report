@@ -145,10 +145,8 @@ Get Backend Weekly Industry Report
 Get Current Sprint / Current Focus / Learner Profile / Current Skills
         │
         ▼
-Get AI Prompt (Notion AI Prompts Database)
-        │
-        ▼
 Claude writes the Sunday Learning Report
+(System Prompt embedded in the trigger)
         │
         ▼
 Save to Notion
@@ -213,10 +211,10 @@ Three sources from the original design (LY Tech Blog, Money Forward Developers, 
 | AI | Claude itself (no external AI API) |
 | Article Discovery | WebSearch (domain-restricted) |
 | Knowledge Management | Notion API |
-| Prompt Management | Notion Database (Sunday only — Saturday's prompt is embedded in its trigger) |
+| Prompt Management | Embedded directly in each trigger (no Notion prompt database as of v2.1.0) |
 | Programming Language | n/a (no custom workflow code; trigger prompts + Notion schema only) |
 
-n8n was used for the original v1.0/v1.1 implementation. As of v2.0.0, both workflows run unattended as Claude scheduled tasks; the n8n workflows are disabled but kept in this repo (`workflows/*.json`) for historical reference.
+n8n was used for the original v1.0/v1.1 implementation. As of v2.0.0, both workflows run unattended as Claude scheduled tasks; the n8n workflows are disabled but kept in this repo (`workflows/*.json`) for historical reference. As of v2.1.0, both trigger prompts are self-contained — the "AI Prompts" Notion database that used to hold Sunday's prompt is no longer read by anything.
 
 ---
 
@@ -274,7 +272,7 @@ The `docs` directory contains the complete project documentation.
 Current Version
 
 ```text
-v2.0.0
+v2.1.0
 ```
 
 Status
@@ -315,6 +313,13 @@ Stable
 - Made Priority/Tags dynamic while forbidding unattended schema changes
 - Added the Learning Checklist database and generation step
 - Added the Learning Progress Sync step (Saturday Step 0)
+
+---
+
+## v2.1.0 ✅
+
+- Removed the "AI Prompts" Notion database — Sunday's prompt is now embedded directly in its trigger, matching Saturday
+- Unified prompt strategy across both workflows (fewer Notion round-trips per run, one less database to set up)
 
 ---
 

@@ -150,11 +150,8 @@ Current Sprintあり    Current Sprintなし
       └──────┬────────┘
              ▼
 
-Get AI Prompt（Notion AI Prompts Database）
-
-↓
-
-Claude writes the Sunday Learning Report（外部AI APIなし）
+Claude writes the Sunday Learning Report
+（System PromptはTrigger定義に直接埋め込み、外部AI APIなし）
 
 ↓
 
@@ -177,49 +174,19 @@ Create Learning Checklist Rows
 
 # AI Prompt Flow
 
-v2.0.0でSaturdayとSundayの方針が分かれた。
-
-## Sunday（従来通り）
+v2.0.0ではSaturdayとSundayで方針が分かれていたが（Saturdayのみ埋め込み方式）、v2.1.0で統一した。
 
 ```text
-Workflow
+Workflow (Saturday / Sunday)
 
 ↓
 
-Notion AI Prompts Database
-
-↓
-
-Report Type
-
-↓
-
-Version
-
-↓
-
-Active
-
-↓
-
-System Prompt
-
-+
-
-User Prompt Template
+System Prompt（それぞれのTrigger定義に直接埋め込み）
 ```
 
-## Saturday（v2.0.0で変更）
+Notionの「AI Prompts Database」からの動的取得は、Saturdayはv2.0.0、Sundayはv2.1.0で廃止した（無人実行の可用性を優先し、Notionへの問い合わせ回数も削減する）。
 
-```text
-Workflow
-
-↓
-
-System Prompt（Trigger定義に直接埋め込み）
-```
-
-Notionからの動的取得はv2.0.0で廃止した（無人実行の可用性を優先）。
+このデータベースはv2.1.0以降どちらのWorkflowからも参照されない。
 
 ---
 
@@ -329,15 +296,9 @@ Learning Checklistは、計画（Learning Report）と実績（実際に完了�
 
 # Prompt Management
 
-Sunday PromptはNotion AI Prompts Databaseで管理する。
+SaturdayもSundayも、Prompt本文はそれぞれのTrigger定義に直接埋め込む（Saturdayはv2.0.0、Sundayはv2.1.0で変更）。
 
-Workflowが取得する情報
-
-- Report Type
-- Version
-- Active
-
-Saturday Promptはv2.0.0でTrigger定義への直接埋め込みへ変更した（無人実行の可用性を優先）。
+Notion AI Prompts Databaseはv2.1.0以降、どちらのWorkflowからも参照されない。理由は無人実行の可用性を優先し、Notionへの問い合わせ回数を減らすため。
 
 ---
 
@@ -418,8 +379,8 @@ Sunday Workflow
 
 Current Version
 
-v2.0.0
+v2.1.0
 
 Status
 
-Design Complete（Claude Scheduled Taskへ移行、Learning Checklist追加）
+Design Complete（Prompt埋め込み方式へ統一、AI Prompts Database依存を解消）
