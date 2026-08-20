@@ -9,6 +9,8 @@ The project consists of two scheduled Claude agents:
 
 Together, they provide a continuous learning cycle from **industry analysis** → **personalized weekly learning** → **progress tracking** → back into the learner's own profile.
 
+**Want to run your own copy?** See [`SETUP.md`](SETUP.md) — it's a single copy-paste prompt, no coding required.
+
 ---
 
 # Overview
@@ -224,12 +226,15 @@ n8n was used for the original v1.0/v1.1 implementation. As of v2.0.0, both workf
 backend-report-project/
 
 ├── README.md
+├── SETUP.md                                  (run your own copy — start here)
 │
 ├── docs/
 │   ├── architecture/
 │   ├── prompts/
 │   │   ├── implementations/
 │   │   └── specification/
+│   ├── setup/
+│   │   └── onboarding-prompt.md              (the copy-paste setup prompt)
 │   └── workflow/
 │
 └── workflows/
