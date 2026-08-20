@@ -35,18 +35,23 @@ Current Sprintあり                Current Sprintなし
         └────────────────┬───────────────┘
                          ▼
                  Get AI Prompt
+             (Notion AI Prompts Database)
                          │
                          ▼
-          Prepare OpenAI Request
-                         │
-                         ▼
-         Generate Sunday Learning Report
+      Claude writes the Sunday Learning Report
+           (no external AI API)
                          │
                          ▼
           Convert to Notion Properties
                          │
                          ▼
                      Notion
+                         │
+                         ▼
+        Extract 3–6 action items
+                         │
+                         ▼
+           Create Learning Checklist rows
 ```
 
 ---
@@ -63,6 +68,7 @@ Current Sprintあり                Current Sprintなし
 - 学習テーマ選定
 - 学習計画作成
 - Sunday Learning Report生成
+- Learning Checklist生成（3〜6項目）
 - Notion保存
 
 対象外
@@ -153,17 +159,17 @@ Current Sprintが存在するか確認する。
 
 ---
 
-## 3. Prepare AI Request
+## 3. Prepare Request
 
 Backend Weekly Industry ReportとLearning Contextを統合し、
 
-OpenAIへ送信するリクエストを生成する。
+Claude自身への入力として組み立てる。外部AI APIは使用しない。
 
 ---
 
 ## 4. AI Analysis
 
-AIは以下を判断する。
+Claudeは以下を判断する。
 
 - 今週学ぶテーマ
 - 学ぶ理由
@@ -186,13 +192,25 @@ Notionへ保存する。
 
 ---
 
+## 7. Learning Checklist Generation
+
+生成したSunday Learning Reportから、
+
+具体的で「終わった/終わっていない」を判定できる粒度の実践項目を
+
+3〜6件抽出し、Learning Checklistデータベースへ新規行として保存する。
+
+各項目の初期状態は Done = false, Reflected = false。
+
+このステップで問題が起きても致命的エラーとせず、処理を継続する。
+
+---
+
 # Outputs
 
 生成される成果物
 
-Sunday Learning Report
-
-内容
+## Sunday Learning Report
 
 - 今週参考にする実践例
 - 今週の技術トレンド
@@ -202,6 +220,17 @@ Sunday Learning Report
 - 今週説明できるようになりたいこと
 - 次週へ引き継ぐ候補
 - Mentor's Advice
+
+## Learning Checklist（新規, v2.0.0）
+
+- Name（実践項目）
+- Done（学習者が手動でチェック）
+- Reflected（Saturday Step 0が反映済みか）
+- Source Report Date
+
+Saturday Step 0（Learning Progress Sync）が読み取り、
+
+Learner Profile / Current Sprintへ反映する。
 
 ---
 
@@ -257,7 +286,7 @@ System Prompt
 
 User Prompt Template
 
-を組み立ててOpenAIへ送信する。
+を組み立てて、Claude自身が実行する（外部AI APIは使用しない）。
 
 ---
 
@@ -309,6 +338,7 @@ Learning Planning
 
 将来的に追加予定
 
+- 重複防止チェック（Backend Weekly Report同様の仕組み）
 - Learning Backlog
 - Monthly Learning Review
 - Sprint Retrospective
@@ -322,8 +352,8 @@ Learning Planning
 
 Current Version
 
-v1.1
+v2.0.0
 
 Status
 
-Implementation Complete
+Implementation Complete（Learning Checklist生成を追加、Claude Scheduled Taskへ移行）

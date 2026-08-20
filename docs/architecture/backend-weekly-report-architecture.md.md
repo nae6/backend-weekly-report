@@ -19,28 +19,32 @@ Backend Weekly Industry Report は、毎週土曜日にバックエンド業界�
 # Architecture
 
 ```text
-                 RSS / Official Sources
+        Step 0: Learning Progress Sync
+     (reflect completed checklist items
+      into Learner Profile / Current Sprint)
                           │
                           ▼
-                 Collect Articles
+        Duplicate Report Check (same day)
                           │
                           ▼
-                 Normalize Articles
+     WebSearch 5 Official Sources (parallel,
+        domain-restricted, no raw WebFetch)
                           │
                           ▼
                 Remove Duplicates
                           │
                           ▼
-                Get AI Prompt
-                          │
-                          ▼
-          Prepare OpenAI Request
+        Claude writes the Industry Report
+           (System Prompt embedded in
+              the trigger, not fetched)
                           │
                           ▼
       Backend Weekly Industry Report
                           │
                           ▼
-                 Convert Properties
+        Assign Priority + Tags
+     (existing Tags options only — no
+        schema changes at runtime)
                           │
                           ▼
                      Notion
@@ -52,7 +56,8 @@ Backend Weekly Industry Report は、毎週土曜日にバックエンド業界�
 
 本ワークフローの責務
 
-- RSS記事収集
+- 学習進捗の反映（Step 0. Learning Progress Sync）
+- 記事収集（WebSearch）
 - Backend関連記事抽出
 - 重複除去
 - 技術分析
@@ -72,46 +77,71 @@ Backend Weekly Industry Report は、毎週土曜日にバックエンド業界�
 
 # Inputs
 
-## RSS Articles
+## Search Results (WebSearch)
 
-記事一覧
+情報源ごとにドメイン制限付きWebSearchで取得する。
 
 含まれる情報
 
 - Title
 - URL
-- Published Date
-- Content
+- Snippet（概要）
+
+RSS/AtomフィードそのものへのWebFetchアクセスは行わない（Unattended Safety、下記参照）。
 
 ---
 
-## AI Prompt
+## System Prompt
 
-Notion AI Prompts Database
+トリガー定義に直接埋め込まれている。
 
-取得項目
+Notion AI Prompts Databaseからの動的取得は行わない（Sunday側とは異なる設計）。
 
-- Report Type
-- Version
-- Active
-- System Prompt
-- User Prompt Template
+---
 
-WorkflowへPrompt本文は保持しない。
+## Learning Checklist (Step 0 の入力)
+
+Notion Learning Checklistデータベースから、
+
+Done = true かつ Reflected = false
+
+の項目を全期間分取得する。
 
 ---
 
 # Processing
 
-## 1. Collect Articles
+## 0. Learning Progress Sync (Step 0)
 
-RSSから記事取得
+Learning Checklistの未反映完了項目を取得し、
+
+Learner Profile
+
+Current Sprint (Learning Contexts)
+
+へ反映する。
+
+反映済み項目は Reflected = true に更新する。
+
+ある週の全項目がDoneになっていれば、
+
+対応するSunday Learning Reportの Learning Completed を true にする。
+
+該当項目が0件の場合は何もせず、後続の処理へ進む。
 
 ---
 
-## 2. Normalize
+## 1. Duplicate Check
 
-OpenAIへ渡しやすい形式へ変換
+本日の日付のBackend Weekly Reportが既に存在するか確認する。
+
+存在すれば新規作成せず、既存ページを報告して終了する。
+
+---
+
+## 2. Collect Articles (WebSearch)
+
+5つの情報源についてドメイン制限付きWebSearchを並列実行する。
 
 ---
 
@@ -123,13 +153,13 @@ OpenAIへ渡しやすい形式へ変換
 
 ## 4. AI Analysis
 
-記事を分析し
+Claude自身が記事を分析し
 
 - 技術的重要性
 - 実務への影響
 - 初学者向け解説
 
-を生成する。
+を生成する。外部AI APIは使用しない。
 
 ---
 
@@ -139,7 +169,17 @@ Backend Weekly Industry Report を生成する。
 
 ---
 
-## 6. Save
+## 6. Priority / Tags Assignment
+
+Priorityは内容に応じて動的判断する。
+
+Tagsは既存の選択肢の中からのみ選択する。
+
+新しい技術名に対応する選択肢がなくても、スキーマ変更は行わない（Unattended Safety）。
+
+---
+
+## 7. Save
 
 Notionへ保存する。
 
@@ -156,8 +196,9 @@ Backend Weekly Industry Report
 - 今週最重要ニュース
 - 技術トレンド
 - 関連技術
-- Mermaid図（必要時）
 - 今週の総括
+
+Mermaid図解セクションはv2.0.0で完全廃止した。
 
 ---
 
@@ -189,21 +230,36 @@ Sunday Learning Report
 
 # AI Prompt Strategy
 
-Promptは
+v1.0まではNotion AI Prompts Databaseから取得していたが、
 
-Notion AI Prompts Database
+v2.0.0でSystem Promptをトリガー定義に直接埋め込む方式へ変更した。
 
-から取得する。
+理由
 
-Workflowには
+無人実行における可用性を優先し、
 
-Prompt本文を書かない。
+Notion側の状態（Active/Versionフラグの設定ミスなど）に依存する箇所を減らすため。
 
-取得条件
+Prompt変更時は、トリガー定義そのものを更新する。
 
-- Report Type
-- Version
-- Active
+---
+
+# Unattended Safety
+
+このワークフローは人が張り付かない前提で実行される。
+
+以下は通常運用フローで行わない。
+
+- Tags列のスキーマ変更（notion-update-data-source による選択肢追加）
+- RSS/AtomフィードへのWebFetch直接アクセス
+
+いずれも、失敗時に処理が止まるのではなく
+
+承認待ちのまま無期限にハングするため、無人実行と相性が悪い。
+
+前者は「既存選択肢のみ使用・空欄許容」、
+
+後者は「WebSearchで代替」することで回避している。
 
 ---
 
@@ -259,8 +315,8 @@ Saturday Workflow は
 
 Current Version
 
-v1.0
+v2.0.0
 
 Status
 
-Implementation Complete
+Implementation Complete (migrated to Claude Scheduled Tasks)
