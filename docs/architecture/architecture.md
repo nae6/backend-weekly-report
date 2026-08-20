@@ -30,10 +30,11 @@ Backend Report Project は、バックエンドエンジニアを目指す学習
 # System Architecture
 
 ```text
-                  RSS / Official Sources
+                  Web Search (5 official sources)
                            │
                            ▼
              Saturday Backend Weekly Report
+                (+ Learning Progress Sync)
                            │
                            ▼
                     Notion Database
@@ -42,17 +43,25 @@ Backend Report Project は、バックエンドエンジニアを目指す学習
           │                                 │
           ▼                                 ▼
  AI Prompts Database              Current Sprint Database
+   (Sunday only)                                │
           │                                 │
           └────────────────┬────────────────┘
                            ▼
                Sunday Learning Planner
                            │
                            ▼
-             Sunday Learning Report
+     Sunday Learning Report + Learning Checklist
                            │
                            ▼
                     Notion Database
+                           │
+              (checked off during the week)
+                           │
+                           ▼
+        fed back into next Saturday's Step 0
 ```
+
+Saturday's prompt is embedded directly in its Claude Scheduled Task, not fetched from the AI Prompts Database — see [Changed: Prompt Management](version-history.md) in v2.0.0.
 
 ---
 
@@ -137,12 +146,33 @@ Sunday Learning Plannerが利用する。
 
 ---
 
+## Learning Checklist Database
+
+役割
+
+その週の学習計画を、実行可能な単位に分解して管理する。
+
+保持する情報
+
+- Name
+- Done
+- Reflected
+- Source Report Date
+
+Sunday Learning Plannerが生成し、
+
+Saturday Step 0（Learning Progress Sync）が読み取る。
+
+チェック（Done）は学習者本人がNotion上で手動で行う。
+
+---
+
 # Prompt Architecture
 
-PromptはWorkflowから分離する。
+PromptはTriggerから分離することを原則とするが、v2.0.0でSaturdayのみ例外を設けた。
 
 ```text
-Workflow
+Sunday Trigger
 
 ↓
 
@@ -158,10 +188,25 @@ User Prompt Template
 
 ↓
 
-OpenAI
+Claude (self)
 ```
 
-Prompt変更時はWorkflowを変更しない。
+```text
+Saturday Trigger
+（System PromptをTrigger定義に直接埋め込み）
+
+↓
+
+Claude (self)
+```
+
+外部AI API（OpenAI）は使用しない。Claude自身がレポートを執筆する。
+
+Saturdayでprompt本文を直接埋め込んでいる理由は、無人実行における可用性を優先し、
+
+Notion側の状態（Active/Versionフラグの設定ミスなど）に依存する箇所を減らすため。
+
+Prompt変更時はTriggerの動作フロー（Step順序）を変更しない。
 
 ---
 
@@ -170,7 +215,15 @@ Prompt変更時はWorkflowを変更しない。
 ## Saturday
 
 ```text
-Collect Articles
+Step 0: Learning Progress Sync
+
+↓
+
+Duplicate Check
+
+↓
+
+Collect Articles (WebSearch)
 
 ↓
 
@@ -207,6 +260,10 @@ Learning Report
 ↓
 
 Notion
+
+↓
+
+Learning Checklist (3–6 items)
 ```
 
 ---
@@ -343,6 +400,25 @@ Architecture
 
 ---
 
+## Unattended Safety
+
+すべてのTriggerは人が張り付いていない状態で実行される前提とする。
+
+このため、以下は通常運用フローで行わない。
+
+- Notionデータベースのスキーマ変更（列・選択肢の追加）
+- RSS/AtomフィードへのWebFetch直接アクセス
+
+これらは失敗時に「エラーで終了する」のではなく
+
+「承認待ちのまま無期限にハングする」ため、通常のエラーハンドリングでは救えない。
+
+スキーマ変更が必要な場合は、対話セッションで人が明示的に承認して行う。
+
+記事収集はドメイン制限付きWebSearchで代替する。
+
+---
+
 # Directory Structure
 
 ```text
@@ -362,7 +438,7 @@ docs/
 
 Current Version
 
-v1.1
+v2.0.0
 
 Status
 

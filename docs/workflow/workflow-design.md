@@ -16,10 +16,11 @@
 # Overall Architecture
 
 ```text
-                RSS / Official Sources
+                Web Search (5 official sources)
                          │
                          ▼
         Saturday Backend Weekly Report
+             (+ Learning Progress Sync)
                          │
                          ▼
                  Notion Database
@@ -28,10 +29,15 @@
           Sunday Learning Planner
                          │
                          ▼
-           Sunday Learning Report
+   Sunday Learning Report + Learning Checklist
                          │
                          ▼
                  Notion Database
+                         │
+            (checked off during the week)
+                         │
+                         ▼
+       fed back into next Saturday's Step 0
 ```
 
 ---
@@ -44,20 +50,27 @@
 
 学習計画は作成しない。
 
+あわせて、Learning Checklistの進捗をLearner Profileへ反映する（Step 0）。
+
 ---
 
 ## Workflow
 
 ```text
-Schedule Trigger
+Claude Scheduled Task (20:00 JST 毎週土曜)
 
 ↓
 
-Collect RSS Articles
+Step 0: Learning Progress Sync
+（未反映の完了項目をLearner Profile / Current Sprintへ反映）
 
 ↓
 
-Normalize Articles
+Duplicate Report Check（同日の重複防止）
+
+↓
+
+WebSearch 5 Official Sources（並列・ドメイン制限）
 
 ↓
 
@@ -65,19 +78,11 @@ Remove Duplicate Topics
 
 ↓
 
-Get AI Prompt
+Claude writes the Report（System Promptはトリガーに埋め込み済み）
 
 ↓
 
-Prepare OpenAI Request
-
-↓
-
-Generate Backend Weekly Industry Report
-
-↓
-
-Convert to Notion Properties
+Assign Priority + Tags（既存Tags選択肢のみ使用）
 
 ↓
 
@@ -88,9 +93,10 @@ Save to Notion
 
 ## Input
 
-- RSS Articles
+- Web Search Results（5情報源）
 - Report Date
-- Backend Weekly Industry Report Prompt
+- System Prompt（トリガー定義に埋め込み、Notion取得なし）
+- Learning Checklist（Step 0の入力）
 
 ---
 
@@ -119,7 +125,7 @@ Current Sprint を前進させる
 ## Workflow
 
 ```text
-Schedule Trigger
+Claude Scheduled Task (20:00 JST 毎週日曜)
 
 ↓
 
@@ -144,15 +150,11 @@ Current Sprintあり    Current Sprintなし
       └──────┬────────┘
              ▼
 
-Get AI Prompt
+Get AI Prompt（Notion AI Prompts Database）
 
 ↓
 
-Prepare OpenAI Request
-
-↓
-
-Generate Sunday Learning Report
+Claude writes the Sunday Learning Report（外部AI APIなし）
 
 ↓
 
@@ -161,13 +163,23 @@ Convert to Notion Properties
 ↓
 
 Save to Notion
+
+↓
+
+Extract 3–6 Action Items
+
+↓
+
+Create Learning Checklist Rows
 ```
 
 ---
 
 # AI Prompt Flow
 
-PromptはWorkflowへ直接保持しない。
+v2.0.0でSaturdayとSundayの方針が分かれた。
+
+## Sunday（従来通り）
 
 ```text
 Workflow
@@ -196,6 +208,18 @@ System Prompt
 
 User Prompt Template
 ```
+
+## Saturday（v2.0.0で変更）
+
+```text
+Workflow
+
+↓
+
+System Prompt（Trigger定義に直接埋め込み）
+```
+
+Notionからの動的取得はv2.0.0で廃止した（無人実行の可用性を優先）。
 
 ---
 
@@ -243,6 +267,18 @@ Learning Decision
 ↓
 
 Sunday Learning Report
+
+↓
+
+Learning Checklist（3〜6項目）
+
+↓
+
+（学習者が週内にチェック）
+
+↓
+
+Saturday Step 0 で Learner Profile へ反映
 ```
 
 Industry Reportは
@@ -250,6 +286,8 @@ Industry Reportは
 Learning Plannerの入力であり、
 
 Learning Reportが業界レポートを置き換えるものではない。
+
+Learning Checklistは、計画（Learning Report）と実績（実際に完了したこと）をつなぐ役割を持つ。
 
 ---
 
@@ -291,19 +329,15 @@ Learning Reportが業界レポートを置き換えるものではない。
 
 # Prompt Management
 
-Promptは
-
-Notion AI Prompts Database
-
-で管理する。
-
-WorkflowへPrompt本文を書かない。
+Sunday PromptはNotion AI Prompts Databaseで管理する。
 
 Workflowが取得する情報
 
 - Report Type
 - Version
 - Active
+
+Saturday Promptはv2.0.0でTrigger定義への直接埋め込みへ変更した（無人実行の可用性を優先）。
 
 ---
 
@@ -367,12 +401,25 @@ Sunday Workflow
 
 ---
 
+## Unattended Safety
+
+すべてのWorkflowは無人・自動実行される前提で設計する。
+
+- Notionスキーマ変更（列・選択肢の追加）を通常運用フローで行わない
+- RSS/AtomフィードへのWebFetch直接アクセスを行わない（WebSearchで代替）
+
+いずれも失敗時にエラー終了ではなく承認待ちで無期限にハングするため、
+
+通常のエラーハンドリングでは救えない。設計段階で回避する。
+
+---
+
 # Version
 
 Current Version
 
-v1.1
+v2.0.0
 
 Status
 
-Design Complete
+Design Complete（Claude Scheduled Taskへ移行、Learning Checklist追加）
