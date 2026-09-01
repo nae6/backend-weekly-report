@@ -4,6 +4,141 @@
 
 ---
 
+# v2.2.0
+
+## Release Date
+
+2026-09
+
+---
+
+## Overview
+
+実行環境を、Claude Code Remoteの共有Cowork環境から、本リポジトリ(backend-weekly-report)専用のClaude Code Remote環境へ移行しました。
+
+Trigger定義(Prompt本文・スケジュール・Notion連携内容)は変更していません。変更したのは「どこで実行されるか」のみです。
+
+---
+
+# Changed
+
+## Execution Environment
+
+両Trigger(Saturday / Sunday)の実行環境を
+
+Cowork Remote環境(汎用・複数プロジェクト共有)
+
+から
+
+本リポジトリ専用のClaude Code Remote環境
+
+へ変更。
+
+理由
+
+- 実行環境をリポジトリのコンテキストに紐付け、将来的にコード(本リポジトリ)を直接読み書きするステップを追加しやすくするため
+- Cowork環境は他プロジェクトと共有されており、本プロジェクト専用の設定として分離するため
+
+---
+
+## Notion Connector 付与方式
+
+新環境では、この組織のアカウント設定上、Trigger作成APIから`connectors`パラメータを直接指定できない制約があることが判明した。
+
+そのため、Notion Connectorは claude.ai の Routines/Cowork 管理画面から、Trigger単位で手動で有効化する運用とした。
+
+新規にTriggerを再作成・移行する場合は、この手動ステップが必要になる点に注意。
+
+---
+
+## Old Triggers
+
+移行元(Cowork環境)のTriggerは削除せず、`enabled: false`で無効化のみ行った。ロールバックが必要な場合は再度有効化できる。
+
+---
+
+# Considered / Rejected
+
+## Sunday Learning PlannerへのGitHub活動反映ステップ追加(一時的に追加後、削除)
+
+Saturday Step 0.5(GitHub反映)と同等の処理をSunday側にも追加することを一時的に試みたが、以下の理由で撤回した。
+
+- SaturdayとSundayの実行間隔は約16時間しかなく、どちらも「直近7日以内のコミット」を参照範囲としているため、Sunday側が新たに拾う差分はSaturday実行後〜Sunday実行までの狭い時間帯のみ
+- その狭い差分のために、GitHub API呼び出し・LLMによる再要約・Notionへの再書き込みを毎週丸ごと繰り返すのはコストに見合わない
+- 「重複記載を避けて統合」をLLM任せで週2回繰り返すことで、Current Skills/Current Focusの文面が徐々にブレる・重複するリスクがある
+
+結論として、GitHub反映(Learning Progress Sync)はSaturdayのみが担当する、というv2.0.0以来の設計を維持する。
+
+---
+
+# Directory Structure
+
+変更なし。
+
+---
+
+# Breaking Changes
+
+なし。Trigger定義(Prompt・スケジュール・Notionスキーマ)は変更していない。実行環境(インフラ)のみの変更。
+
+---
+
+# Future Roadmap
+
+予定(v2.1.0から変更なし)
+
+- Sunday Workflowへの重複防止チェック追加
+- Learning Checklist抽出粒度のチューニング
+- Learning Backlog
+- Monthly Learning Review
+- Sprint Retrospective
+- Portfolio Review
+- Career Review
+
+検討中(未着手)
+
+- Learning Contexts データベースをLearner Profileへ統合し、データベース数をさらに減らす案(Sprintの履歴管理をどう扱うか要検討のため保留)
+
+---
+
+# Current Status
+
+Architecture
+
+Completed
+
+Prompt
+
+Completed(v2.1.0から変更なし)
+
+Specification
+
+Completed
+
+Workflow
+
+Migrated to repository-scoped Claude Code Remote environment
+
+Learning Progress Sync
+
+Implemented(Saturdayのみ。Sundayへの拡張は検討の上見送り)
+
+Learning Checklist
+
+Implemented
+
+---
+
+# Current Version (as of v2.2.0)
+
+v2.2.0
+
+Status
+
+Stable
+
+---
+
 # v2.1.0
 
 ## Release Date
@@ -115,6 +250,8 @@ v2.1.0
 Status
 
 Stable
+
+(superseded by v2.2.0 — see top of this document for the current version)
 
 ---
 

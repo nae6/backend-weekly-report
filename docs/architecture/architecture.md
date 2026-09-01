@@ -59,6 +59,8 @@ Backend Report Project は、バックエンドエンジニアを目指す学習
 
 Both Saturday's and Sunday's prompts are embedded directly in their Claude Scheduled Task, not fetched from Notion — see [Changed: Prompt Management](version-history.md) in v2.0.0 (Saturday) and v2.1.0 (Sunday).
 
+両Triggerは、v2.2.0以降、本リポジトリ(backend-weekly-report)専用のClaude Code Remote環境で実行される。それ以前は複数プロジェクト共有のCowork Remote環境で実行されていた。詳細は[version-history.md](version-history.md)のv2.2.0を参照。
+
 ---
 
 # Components
@@ -410,7 +412,7 @@ docs/
 
 Current Version
 
-v2.1.0
+v2.2.0
 
 Status
 
