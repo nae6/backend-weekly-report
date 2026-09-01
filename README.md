@@ -212,9 +212,10 @@ Three sources from the original design (LY Tech Blog, Money Forward Developers, 
 | Article Discovery | WebSearch (domain-restricted) |
 | Knowledge Management | Notion API |
 | Prompt Management | Embedded directly in each trigger (no Notion prompt database as of v2.1.0) |
+| Execution Environment | Repository-scoped Claude Code Remote environment (as of v2.2.0) |
 | Programming Language | n/a (no custom workflow code; trigger prompts + Notion schema only) |
 
-n8n was used for the original v1.0/v1.1 implementation. As of v2.0.0, both workflows run unattended as Claude scheduled tasks; the n8n workflows are disabled but kept in this repo (`workflows/*.json`) for historical reference. As of v2.1.0, both trigger prompts are self-contained — the "AI Prompts" Notion database that used to hold Sunday's prompt is no longer read by anything.
+n8n was used for the original v1.0/v1.1 implementation. As of v2.0.0, both workflows run unattended as Claude scheduled tasks; the n8n workflows are disabled but kept in this repo (`workflows/*.json`) for historical reference. As of v2.1.0, both trigger prompts are self-contained — the "AI Prompts" Notion database that used to hold Sunday's prompt is no longer read by anything. As of v2.2.0, both triggers run in a Claude Code Remote environment scoped to this repository, rather than the shared Cowork environment used previously.
 
 ---
 
@@ -272,7 +273,7 @@ The `docs` directory contains the complete project documentation.
 Current Version
 
 ```text
-v2.1.0
+v2.2.0
 ```
 
 Status
@@ -320,6 +321,15 @@ Stable
 
 - Removed the "AI Prompts" Notion database — Sunday's prompt is now embedded directly in its trigger, matching Saturday
 - Unified prompt strategy across both workflows (fewer Notion round-trips per run, one less database to set up)
+
+---
+
+## v2.2.0 ✅
+
+- Migrated both triggers from the shared Cowork Remote environment to a Claude Code Remote environment scoped to this repository
+- Notion connector is now granted per-trigger via the claude.ai Routines UI, since this org's trigger-creation API rejects the `connectors` parameter directly
+- Old Cowork-environment triggers disabled (not deleted) for rollback safety
+- Considered adding a GitHub-activity reflection step to Sunday as well (mirroring Saturday's Step 0.5), but rejected it — the two runs are ~16 hours apart and both look back 7 days, so the added coverage was marginal against the cost/duplication risk of re-running it twice a week
 
 ---
 
