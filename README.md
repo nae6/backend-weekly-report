@@ -216,10 +216,10 @@ Three sources from the original design (LY Tech Blog, Money Forward Developers, 
 | Article Discovery | WebSearch (domain-restricted) |
 | Knowledge Management | Notion API |
 | Prompt Management | Embedded directly in each trigger (no Notion prompt database as of v2.1.0) |
-| Execution Environment | Repository-scoped Claude Code Remote environment (as of v2.2.0) |
+| Execution Environment | Claude Code Remote routines; GitHub access limited to repositories attached per trigger (Saturday: learning repos for Step 0.5 / Sunday: none) |
 | Programming Language | n/a (no custom workflow code; trigger prompts + Notion schema only) |
 
-n8n was used for the original v1.0/v1.1 implementation. As of v2.0.0, both workflows run unattended as Claude scheduled tasks; the n8n workflows are disabled but kept in this repo (`workflows/*.json`) for historical reference. As of v2.1.0, both trigger prompts are self-contained — the "AI Prompts" Notion database that used to hold Sunday's prompt is no longer read by anything. As of v2.2.0, both triggers run in a Claude Code Remote environment scoped to this repository, rather than the shared Cowork environment used previously.
+n8n was used for the original v1.0/v1.1 implementation. As of v2.0.0, both workflows run unattended as Claude scheduled tasks; the n8n workflows are disabled but kept in this repo (`workflows/*.json`) for historical reference. As of v2.1.0, both trigger prompts are self-contained — the "AI Prompts" Notion database that used to hold Sunday's prompt is no longer read by anything. As of v2.2.0, both triggers run as Claude Code Remote routines rather than in the shared Cowork environment used previously; GitHub access is granted per trigger by attaching repositories (see v2.3.1).
 
 ---
 
@@ -277,7 +277,7 @@ The `docs` directory contains the complete project documentation.
 Current Version
 
 ```text
-v2.3.0
+v2.3.1
 ```
 
 Status
@@ -342,6 +342,13 @@ Stable
 - Sunday prompt now carries a `PROMPT_VERSION`, and each Sunday Learning Report's `Version` property records it (previously hard-coded to `1.0.0`)
 - Sunday schedule documented as 12:00 JST (matches the live trigger)
 - Caught the repository up with changes made directly to the Saturday trigger: Step 0.5 (GitHub activity sync), up to 6 top news items, and the Role Model / Deep Dive Topic sections
+
+---
+
+## v2.3.1 ✅
+
+- Fixed Saturday Step 0.5 (GitHub activity sync), which had been silently skipped on every run: the learning repositories are now attached to the Saturday trigger, since routines can only reach repos attached to them
+- Corrected the v2.2.0 "repository-scoped environment" description
 
 ---
 
