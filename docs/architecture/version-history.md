@@ -4,6 +4,68 @@
 
 ---
 
+# v2.3.1
+
+## Release Date
+
+2026-09
+
+---
+
+## Overview
+
+Saturday Step 0.5（GitHub Activity Sync）が実際には一度も動いていなかった原因を修正しました。プロンプトの変更はありません。
+
+---
+
+# Fixed
+
+## Saturday: GitHub repositories attached to the trigger
+
+2026-09-26の実行ログで、実行環境に「No sources configured」と記録され、Step 0.5の `nae6/*` へのGitHub API呼び出しがすべて `GitHub access to this repository is not enabled for this session` で拒否されていた（プロンプトの指示どおり黙ってスキップされていたため、エラーにはならなかった）。
+
+routineの実行環境は、**トリガーに割り当てられたリポジトリ（`job_config.ccr.session_context.sources`）にしかGitHub APIでアクセスできない**。この制約はプロンプトでは回避できない。
+
+Saturdayトリガーに以下を割り当てた。
+
+- `nae6/laravel-attendance-app`
+- `nae6/flea-market-app`
+- `nae6/laravel-contact-form`
+- `nae6/life-plan-app`
+
+新しい学習用リポジトリを作ったら、Step 0.5の対象にするにはSaturdayトリガーへの割り当ても追加する必要がある。
+
+Sundayトリガーと `backend-weekly-report` 本体はGitHubを読まないため、割り当て不要。
+
+---
+
+## Documentation: v2.2.0 の「リポジトリ専用環境」の記載を訂正
+
+v2.2.0では「本リポジトリ(backend-weekly-report)専用のClaude Code Remote環境へ移行した」と記載したが、実態は以下のとおり。
+
+- 両トリガーとも共通の実行環境（Default）で動いており、`backend-weekly-report` は割り当てられていない（どちらのトリガーもこのリポジトリを読み書きしないため不要）
+- リポジトリへのアクセスは環境単位ではなく**トリガー単位**で、`sources` に割り当てたものだけに限られる
+
+architecture.md / README の該当記載を修正した。
+
+---
+
+# Known Issues
+
+- Step 0.5 がリポジトリを読めることは、割り当て後の最初の実行（2026-10-03 土曜）の実行ログでまだ確認していない。
+
+---
+
+# Current Version (as of v2.3.1)
+
+v2.3.1
+
+Status
+
+Stable
+
+---
+
 # v2.3.0
 
 ## Release Date
@@ -50,7 +112,7 @@ v2.0以降にトリガーへ直接加えられていたが、リポジトリに�
 
 # Known Issues
 
-- 稼働中の両トリガーは、リポジトリ（sources）が割り当てられていない状態で動いている。v2.2.0で記載した「本リポジトリ専用の環境」と実態が一致しているかは要確認。
+- ~~稼働中の両トリガーは、リポジトリ（sources）が割り当てられていない状態で動いている。v2.2.0で記載した「本リポジトリ専用の環境」と実態が一致しているかは要確認。~~ → v2.3.1で対応
 - ~~architecture / workflow / specification 配下のドキュメントは、Saturdayの Role Model / Deep Dive Topic 追加をまだ反映していない。~~ → 反映済み（[spec v2.3](../prompts/specification/backend-weekly-report-spec-v2.3.md)）
 
 ---
@@ -68,6 +130,8 @@ v2.3.0
 Status
 
 Stable
+
+(superseded by v2.3.1 — see top of this document for the current version)
 
 ---
 
