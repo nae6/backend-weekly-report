@@ -4,6 +4,73 @@
 
 ---
 
+# v2.3.0
+
+## Release Date
+
+2026-09
+
+---
+
+## Overview
+
+実際に稼働しているトリガーのプロンプトと、本リポジトリの記録を同期しました。あわせて、Sunday Learning Reportに書き込む ` Version` をプロンプトのバージョンと連動させました。
+
+---
+
+# Changed
+
+## Sunday: Prompt Versioning
+
+プロンプト冒頭に `PROMPT_VERSION`（本ドキュメントのバージョン番号と一致させる）・バージョン更新ルール・変更履歴を追加。
+
+Sunday Learning Reportsの ` Version` プロパティには、固定値 `"1.0.0"` ではなく `PROMPT_VERSION` の値を書き込むよう変更した。v2.3.0より前に生成されたレポートは、実際のプロンプトのバージョンに関わらずすべて `1.0.0` になっている点に注意。
+
+## Sunday: Schedule
+
+実行時刻を日曜20:00 JSTから日曜12:00 JSTへ変更（トリガーのcronに合わせてドキュメントを更新）。
+
+## Saturday: Prompt (documentation catch-up)
+
+v2.0以降にトリガーへ直接加えられていたが、リポジトリに記録されていなかった変更を [backend-weekly-report-v2.3.md](../prompts/implementations/backend-weekly-report-v2.3.md) にまとめて記録した。
+
+- Step 0.5（GitHub活動の反映）
+- Step 0のCurrent Skills / Learning Contexts更新ルールの具体化
+- 最重要ニュースを基準3件・最大6件へ
+- ④ Role Model / ⑤ Deep Dive Topic セクションと、同名Notionプロパティへの書き込み
+
+## Trigger IDs
+
+現在稼働しているトリガーは以下。
+
+- Saturday: `trig_01DjTrPtLLGGngboT5sUjGdt`（土曜20:00 JST）
+- Sunday: `trig_019vmGyVPup6KZr89Dydsr3f`（日曜12:00 JST）
+
+---
+
+# Known Issues
+
+- 稼働中の両トリガーは、リポジトリ（sources）が割り当てられていない状態で動いている。v2.2.0で記載した「本リポジトリ専用の環境」と実態が一致しているかは要確認。
+- architecture / workflow / specification 配下のドキュメントは、Saturdayの Role Model / Deep Dive Topic 追加をまだ反映していない。
+
+---
+
+# Breaking Changes
+
+なし。Notionスキーマは変更していない（` Version` に書き込む値のみ変更）。
+
+---
+
+# Current Version (as of v2.3.0)
+
+v2.3.0
+
+Status
+
+Stable
+
+---
+
 # v2.2.0
 
 ## Release Date
@@ -136,6 +203,8 @@ v2.2.0
 Status
 
 Stable
+
+(superseded by v2.3.0 — see top of this document for the current version)
 
 ---
 
