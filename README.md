@@ -116,6 +116,10 @@ Step 0: Sync completed Learning Checklist items
    → Learner Profile / Current Sprint / "Learning Completed" flag
         │
         ▼
+Step 0.5: Sync recent GitHub activity
+   → Learner Profile / Current Sprint
+        │
+        ▼
 Duplicate-report check (same-day idempotency)
         │
         ▼
@@ -133,7 +137,7 @@ Save to Notion
 
 ---
 
-## Sunday (Claude Scheduled Task, 20:00 JST every Sunday)
+## Sunday (Claude Scheduled Task, 12:00 JST every Sunday)
 
 ```text
 Scheduled Trigger
@@ -273,7 +277,7 @@ The `docs` directory contains the complete project documentation.
 Current Version
 
 ```text
-v2.2.0
+v2.3.0
 ```
 
 Status
@@ -330,6 +334,14 @@ Stable
 - Notion connector is now granted per-trigger via the claude.ai Routines UI, since this org's trigger-creation API rejects the `connectors` parameter directly
 - Old Cowork-environment triggers disabled (not deleted) for rollback safety
 - Considered adding a GitHub-activity reflection step to Sunday as well (mirroring Saturday's Step 0.5), but rejected it — the two runs are ~16 hours apart and both look back 7 days, so the added coverage was marginal against the cost/duplication risk of re-running it twice a week
+
+---
+
+## v2.3.0 ✅
+
+- Sunday prompt now carries a `PROMPT_VERSION`, and each Sunday Learning Report's `Version` property records it (previously hard-coded to `1.0.0`)
+- Sunday schedule documented as 12:00 JST (matches the live trigger)
+- Caught the repository up with changes made directly to the Saturday trigger: Step 0.5 (GitHub activity sync), up to 6 top news items, and the Role Model / Deep Dive Topic sections
 
 ---
 
