@@ -69,10 +69,12 @@ Both Saturday's and Sunday's prompts are embedded directly in their Claude Sched
 
 役割
 
-- RSS記事収集
+- 記事収集（ドメイン制限付きWebSearch）
 - 技術分析
 - 業界動向整理
+- Role Model / Deep Dive Topic の選定
 - Industry Report生成
+- 学習進捗の反映（Step 0: Learning Checklist / Step 0.5: GitHub活動）
 
 生成物
 
@@ -140,6 +142,8 @@ Sunday Learning Plannerが利用する。
 - Backend Weekly Industry Report
 - Sunday Learning Report
 
+Backend Weekly Reportsデータベースは、Priority / Tags に加えて Role Model / Deep Dive Topic（テキスト）を持つ。該当なしの週は空欄。
+
 ---
 
 ## Learning Checklist Database
@@ -193,6 +197,10 @@ Step 0: Learning Progress Sync
 
 ↓
 
+Step 0.5: GitHub Activity Sync
+
+↓
+
 Duplicate Check
 
 ↓
@@ -206,6 +214,7 @@ Industry Analysis
 ↓
 
 Industry Report
+（①ニュース ②トレンド ③関連技術 ④Role Model ⑤Deep Dive Topic ⑥総括）
 
 ↓
 
@@ -251,6 +260,7 @@ Learning Checklist (3–6 items)
 - 情報収集
 - 技術分析
 - 業界整理
+- Role Model / Deep Dive Topic の紹介（Current Sprintとの関連判断はしない）
 
 担当しない
 
@@ -412,7 +422,7 @@ docs/
 
 Current Version
 
-v2.2.0
+v2.3.0
 
 Status
 
