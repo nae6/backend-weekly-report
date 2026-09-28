@@ -51,7 +51,7 @@ v2.0以降にトリガーへ直接加えられていたが、リポジトリに�
 # Known Issues
 
 - 稼働中の両トリガーは、リポジトリ（sources）が割り当てられていない状態で動いている。v2.2.0で記載した「本リポジトリ専用の環境」と実態が一致しているかは要確認。
-- architecture / workflow / specification 配下のドキュメントは、Saturdayの Role Model / Deep Dive Topic 追加をまだ反映していない。
+- ~~architecture / workflow / specification 配下のドキュメントは、Saturdayの Role Model / Deep Dive Topic 追加をまだ反映していない。~~ → 反映済み（[spec v2.3](../prompts/specification/backend-weekly-report-spec-v2.3.md)）
 
 ---
 

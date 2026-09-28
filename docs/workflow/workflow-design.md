@@ -50,7 +50,7 @@
 
 学習計画は作成しない。
 
-あわせて、Learning Checklistの進捗をLearner Profileへ反映する（Step 0）。
+あわせて、Learning Checklistの進捗（Step 0）とGitHub上の実際の活動（Step 0.5）をLearner Profileへ反映する。
 
 ---
 
@@ -63,6 +63,11 @@ Claude Scheduled Task (20:00 JST 毎週土曜)
 
 Step 0: Learning Progress Sync
 （未反映の完了項目をLearner Profile / Current Sprintへ反映）
+
+↓
+
+Step 0.5: GitHub Activity Sync
+（直近7日のコミットをLearner Profile / Current Sprintへ反映）
 
 ↓
 
@@ -82,7 +87,7 @@ Claude writes the Report（System Promptはトリガーに埋め込み済み）
 
 ↓
 
-Assign Priority + Tags（既存Tags選択肢のみ使用）
+Assign Priority + Tags（既存Tags選択肢のみ使用）+ Role Model / Deep Dive Topic
 
 ↓
 
@@ -97,12 +102,24 @@ Save to Notion
 - Report Date
 - System Prompt（トリガー定義に埋め込み、Notion取得なし）
 - Learning Checklist（Step 0の入力）
+- GitHub Commits（Step 0.5の入力、直近7日・実行環境で許可されたリポジトリのみ）
 
 ---
 
 ## Output
 
 Backend Weekly Industry Report
+
+構成
+
+- ① 今週最重要ニュース（基準3件、最大6件）
+- ② 今週の技術トレンド
+- ③ 関連技術
+- ④ Role Model
+- ⑤ Deep Dive Topic
+- ⑥ 今週の総括
+
+④・⑤は該当なしの週は無理に選ばず「今週は該当なし」とする。
 
 保存先
 
@@ -125,7 +142,7 @@ Current Sprint を前進させる
 ## Workflow
 
 ```text
-Claude Scheduled Task (20:00 JST 毎週日曜)
+Claude Scheduled Task (12:00 JST 毎週日曜)
 
 ↓
 
@@ -268,6 +285,7 @@ Learning Checklistは、計画（Learning Report）と実績（実際に完了�
 - 技術分析
 - 技術トレンド整理
 - 実務解説
+- Role Model / Deep Dive Topic の紹介
 
 作らないもの
 
@@ -379,8 +397,8 @@ Sunday Workflow
 
 Current Version
 
-v2.1.0
+v2.3.0
 
 Status
 
-Design Complete（Prompt埋め込み方式へ統一、AI Prompts Database依存を解消）
+Design Complete（Step 0.5 GitHub Activity Sync、Role Model / Deep Dive Topic を反映）

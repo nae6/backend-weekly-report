@@ -24,6 +24,11 @@ Backend Weekly Industry Report は、毎週土曜日にバックエンド業界�
       into Learner Profile / Current Sprint)
                           │
                           ▼
+        Step 0.5: GitHub Activity Sync
+     (reflect last 7 days of commits
+      into Learner Profile / Current Sprint)
+                          │
+                          ▼
         Duplicate Report Check (same day)
                           │
                           ▼
@@ -42,7 +47,8 @@ Backend Weekly Industry Report は、毎週土曜日にバックエンド業界�
       Backend Weekly Industry Report
                           │
                           ▼
-        Assign Priority + Tags
+   Assign Priority + Tags + Role Model
+            + Deep Dive Topic
      (existing Tags options only — no
         schema changes at runtime)
                           │
@@ -57,12 +63,14 @@ Backend Weekly Industry Report は、毎週土曜日にバックエンド業界�
 本ワークフローの責務
 
 - 学習進捗の反映（Step 0. Learning Progress Sync）
+- GitHub活動の反映（Step 0.5. GitHub Activity Sync）
 - 記事収集（WebSearch）
 - Backend関連記事抽出
 - 重複除去
 - 技術分析
 - 技術トレンド整理
 - 実務への影響整理
+- Role Model / Deep Dive Topic の選定
 - Industry Report生成
 - Notion保存
 
@@ -109,6 +117,14 @@ Done = true かつ Reflected = false
 
 ---
 
+## GitHub Commits (Step 0.5 の入力)
+
+`nae6/*` の各リポジトリ（`backend-weekly-report` 自体を除く）から、直近7日以内のコミットを取得する。
+
+実行環境で許可されていないリポジトリは取得できないため、スキップする。
+
+---
+
 # Processing
 
 ## 0. Learning Progress Sync (Step 0)
@@ -128,6 +144,22 @@ Current Sprint (Learning Contexts)
 対応するSunday Learning Reportの Learning Completed を true にする。
 
 該当項目が0件の場合は何もせず、後続の処理へ進む。
+
+Learner Profileの "Current Skills" は「◆カテゴリ名: 内容」のブロック単位で追記し、"Current Focus" は短いポインタとして維持する。
+
+Current SprintはDefinition of Doneのチェック更新と「## 進捗反映ログ」への日付付き追記で反映する。
+
+---
+
+## 0.5. GitHub Activity Sync (Step 0.5)
+
+直近7日以内にコミットがあったリポジトリについて、何を実装・学習したかをリポジトリ単位・テーマ単位で要約し、
+
+Step 0と同じルールでLearner Profile / Current Sprintへ反映する。
+
+Step 0で反映済みの内容とは重複させず統合し、矛盾する場合は直近のコミット内容を優先する。
+
+Step 0の結果に関わらず毎回実行する。失敗しても致命的エラーとせず、後続の処理へ進む。
 
 ---
 
@@ -167,6 +199,8 @@ Claude自身が記事を分析し
 
 Backend Weekly Industry Report を生成する。
 
+Role Model / Deep Dive Topic は、紹介する価値のある人物・技術が見つからない週は無理に選ばない（本文に「今週は該当なし」とだけ書く）。
+
 ---
 
 ## 6. Priority / Tags Assignment
@@ -176,6 +210,8 @@ Priorityは内容に応じて動的判断する。
 Tagsは既存の選択肢の中からのみ選択する。
 
 新しい技術名に対応する選択肢がなくても、スキーマ変更は行わない（Unattended Safety）。
+
+あわせて、Role Model / Deep Dive Topic プロパティに④・⑤で取り上げた人物名・技術名を書き込む（該当なしの週は空欄）。
 
 ---
 
@@ -193,10 +229,17 @@ Backend Weekly Industry Report
 
 内容
 
-- 今週最重要ニュース
-- 技術トレンド
-- 関連技術
-- 今週の総括
+- ① 今週最重要ニュース（基準3件、最大6件）
+- ② 技術トレンド
+- ③ 関連技術
+- ④ Role Model（今週参考にできる人物）
+- ⑤ Deep Dive Topic（今週の深掘り技術）
+- ⑥ 今週の総括
+
+Notionプロパティ
+
+- Priority / Tags（動的判断、既存Tags選択肢のみ）
+- Role Model / Deep Dive Topic（該当なしの週は空欄）
 
 Mermaid図解セクションはv2.0.0で完全廃止した。
 
@@ -315,8 +358,10 @@ Saturday Workflow は
 
 Current Version
 
-v2.0.0
+v2.3.0
 
 Status
 
-Implementation Complete (migrated to Claude Scheduled Tasks)
+Implementation Complete（Step 0.5 GitHub Activity Sync、Role Model / Deep Dive Topic を反映）
+
+詳細は [spec v2.3](../prompts/specification/backend-weekly-report-spec-v2.3.md) を参照。
